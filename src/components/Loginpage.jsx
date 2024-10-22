@@ -67,7 +67,7 @@ const LoginPage = () => {
                     password: signInPassword,
                 });
                 localStorage.setItem('token', response.data.token); // Save the token
-                navigate(`/main/${userName}`); // Navigate to the main page
+                navigate('/main'); // Navigate to the main page
             } else {
                 const response = await axios.post(`${API_URL}/register`, {
                     name: signUpName,
@@ -76,7 +76,7 @@ const LoginPage = () => {
                     password: signUpPassword,
                 });
                 localStorage.setItem('token', response.data.token); // Save the token
-                navigate(`/main/${userName}`); // Navigate to the main page
+                navigate('/main'); // Navigate to the main page
             }
         } catch (err) {
             console.error('Error response:', err.response); // Log the entire error response

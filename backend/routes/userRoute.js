@@ -5,23 +5,18 @@ import User from '../models/User.js';
 const router = express.Router();
 
 // Route to fetch user details
-router.get('/', authService.authenticateRequest, async (req, res) => {
-    try {
-        // Fetch user based on the userID stored in the token
-        const user = await User.findOne({ where: { userID: req.user.userID } });
-        if (!user) {
-            return res.status(404).json({ msg: 'User not found' });
+router.get('/', authService.authenticateRequest, (req, res) => {
+    // Access the user object attached to req
+    const { name, emailID, pfpUrl } = req.user; // Get user details directly from req.user
+
+    // Respond with the user details
+    res.json({ 
+        user: {
+            name,
+            emailID,
+            pfpUrl,
         }
-        res.json({ 
-            user: {
-                name: user.name,
-                emailID: user.emailID,
-                pfpUrl: user.pfpUrl, // Ensure this field exists in your model
-            }
-        });
-    } catch (error) {
-        res.status(500).json({ msg: 'Server error' });
-    }
+    });
 });
 
 export default router;

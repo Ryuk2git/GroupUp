@@ -99,8 +99,9 @@ const authService = {
     },
 
     // Middleware to authenticate a request using JWT
-    authenticateRequest: (req, res, next) => {
+    authenticateRequest: async (req, res, next) => {
         const token = req.header('x-auth-token'); // Assuming the token is in the 'x-auth-token' header
+        console.log('Token:', token);
         if (!token) {
             return res.status(401).json({ msg: 'No token, authorization denied' });
         }
@@ -110,12 +111,27 @@ const authService = {
             if (!decoded) {
                 return res.status(401).json({ msg: 'Invalid token' });
             }
-            req.user = decoded.user;
+
+            // Fetch user details from the database using userID from decoded token
+            const user = await User.findOne({ where: { userID: decoded.user.userID } });
+            if (!user) {
+                return res.status(404).json({ msg: 'User not found' });
+            }
+
+            // Attach user details to the request object
+            req.user = {
+                userID: user.userID,
+                name: user.name,
+                emailID: user.emailID,
+                pfpUrl: user.pfpUrl,
+                // Include any other fields you want to access
+            };
+
             next();
         } catch (err) {
             res.status(401).json({ msg: 'Token is not valid' });
         }
-    },
+    }
 };
 
 export default authService;
