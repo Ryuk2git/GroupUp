@@ -1,8 +1,36 @@
-# React + Vite
+Installation
+To run the project locally, follow these steps:
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Prerequisites
+1. Node.js: Ensure you have Node.js installed.
+2. Git: You'll need Git for version control.
+3. MongoDB: The project uses MongoDB for the database, so ensure it's installed and running.
 
-Currently, two official plugins are available:
+CLoning and starting the porject:
+1. Clone the Project
+First, clone the repository from GitHub to your local machine:
+  git clone https://github.com/Ryuk2git/GroupUp.git
+  cd GroupUp
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+3. Install Dependencies
+After cloning the project, navigate into the project folder and install the required dependencies:
+  npm install
+
+3. Start the Database
+Import the CurrentWorking.sql file into your database system(MySQL Workbench)
+Use the groupproxy database:
+  USE groupproxy;
+  SOURCE /path/to/CurrentWorking.sql;
+This will set up the database schema and initial data required for the project.
+
+4. Start the Server
+Navigate to the project folder and start the backend server using the following command:
+  npm start index.js
+This will start the backend service and connect it to the database.
+
+5. Start the Frontend
+Open a new terminal, navigate to the project folder, and run the following command to start the frontend development server:
+  npm run dev
+This will start the frontend on your local development server (usually accessible at http://localhost:3173).
+
+Project update:
