@@ -3,7 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import authRoutes from './routes/authRoutes.js'; // Your auth routes
 import userRoutes from './routes/userRoute.js'; // Import user routes
-import fileRoutes from './routes/fileRoutes.js'; // Your file routes
+import fileRoutes from './routes/fileRoute.js'; // Your file routes
 import { Sequelize } from 'sequelize';
 import morgan from 'morgan'; // For logging HTTP requests
 

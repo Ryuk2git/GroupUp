@@ -1,3 +1,4 @@
+// CodeEditorPage.jsx
 import React, { useState } from 'react';
 import MonacoEditor from '@monaco-editor/react';
 import '../styles/CodeEditor.css';
@@ -9,9 +10,9 @@ const CodeEditorPage = () => {
   ]);
   const [activeFileIndex, setActiveFileIndex] = useState(0);
   const [output, setOutput] = useState('');
-  const [editorHeight, setEditorHeight] = useState('80%');  // Initial editor height
-  const [consoleHeight, setConsoleHeight] = useState('150px');  // Initial console height
-  const [isResizing, setIsResizing] = useState(false);  // Track if resizing is happening
+  const [editorHeight, setEditorHeight] = useState('80%');
+  const [consoleHeight, setConsoleHeight] = useState('150px');
+  const [isResizing, setIsResizing] = useState(false);
 
   const handleEditorChange = (value) => {
     const updatedFiles = [...files];
@@ -20,7 +21,6 @@ const CodeEditorPage = () => {
   };
 
   const runCode = () => {
-    // Dummy compilation logic
     setOutput(`Running ${files[activeFileIndex].name}...\nOutput:\nHello, World!`);
   };
 
@@ -34,9 +34,9 @@ const CodeEditorPage = () => {
 
   const handleMouseMove = (e) => {
     if (!isResizing) return;
-    const newEditorHeight = `${e.clientY}px`; // Set editor height based on cursor Y position
+    const newEditorHeight = `${e.clientY}px`;
     setEditorHeight(newEditorHeight);
-    setConsoleHeight(`calc(100vh - ${newEditorHeight} - 35px)`); // Adjust console height
+    setConsoleHeight(`calc(100vh - ${newEditorHeight} - 35px)`);
   };
 
   const handleMouseUp = () => {
@@ -45,7 +45,6 @@ const CodeEditorPage = () => {
 
   return (
     <div className="code-editor-page" onMouseMove={handleMouseMove} onMouseUp={handleMouseUp}>
-      {/* Top Bar with Tabs and Run Button */}
       <div className="top-bar">
         <div className="tabs">
           {files.map((file, index) => (
@@ -63,10 +62,9 @@ const CodeEditorPage = () => {
         </div>
       </div>
 
-      {/* Code Editor */}
       <div className="editor-container" style={{ height: editorHeight }}>
         <MonacoEditor
-          height="100%" // Editor fills the remaining space
+          height="100%"
           language={files[activeFileIndex].name.endsWith('.py') ? 'python' : 'javascript'}
           theme="vs-dark"
           value={files[activeFileIndex].content}
@@ -74,10 +72,8 @@ const CodeEditorPage = () => {
         />
       </div>
 
-      {/* Split Pane Divider */}
       <div className="split-pane-divider" onMouseDown={handleMouseDown}></div>
 
-      {/* Console at the Bottom */}
       <div className="console" style={{ height: consoleHeight }}>
         <div className="console-output">
           <pre>{output}</pre>

@@ -5,15 +5,15 @@ const FileList = () => {
     const [files, setFiles] = useState([
         { name: 'index.html', type: 'file' },
         { name: 'App.jsx', type: 'file' },
-        { name: 'components/', type: 'folder', children: ['Header.jsx', 'Footer.jsx'] },
-        { name: 'styles/', type: 'folder', children: ['main.css', 'Login_page.css'] },
+        { name: 'components/', type: 'folder', children: [] },
+        { name: 'styles/', type: 'folder', children: [] },
     ]);
 
     const [openFile, setOpenFile] = useState('');
     const [openFolders, setOpenFolders] = useState([]);
     const [contextMenu, setContextMenu] = useState({ visible: false, x: 0, y: 0, item: null });
-    const [copiedItem, setCopiedItem] = useState(null); // For copy/paste functionality
-    const [renameTarget, setRenameTarget] = useState(null); // For renaming functionality
+    const [copiedItem, setCopiedItem] = useState(null);
+    const [renameTarget, setRenameTarget] = useState(null);
     const [newName, setNewName] = useState('');
     const menuRef = useRef(null);
 
@@ -39,14 +39,25 @@ const FileList = () => {
 
     // Handle delete action
     const handleDelete = () => {
-        if (contextMenu.item.type === 'file') {
-            const updatedFiles = files.filter(file => file.name !== contextMenu.item.name);
-            setFiles(updatedFiles);
-        } else if (contextMenu.item.type === 'folder') {
-            const updatedFiles = files.filter(file => file.name !== contextMenu.item.name);
-            setFiles(updatedFiles);
-        }
+        const updatedFiles = deleteItem(files, contextMenu.item.name);
+        setFiles(updatedFiles);
         setContextMenu({ ...contextMenu, visible: false });
+    };
+
+    // Helper function to delete item recursively
+    const deleteItem = (items, name) => {
+        return items.reduce((acc, item) => {
+            if (item.name === name) {
+                return acc; // Skip the item to delete
+            }
+            if (item.type === 'folder') {
+                const updatedChildren = deleteItem(item.children, name);
+                acc.push({ ...item, children: updatedChildren });
+            } else {
+                acc.push(item);
+            }
+            return acc;
+        }, []);
     };
 
     // Handle copy action
@@ -58,16 +69,23 @@ const FileList = () => {
     // Handle paste action
     const handlePaste = () => {
         if (copiedItem && contextMenu.item.type === 'folder') {
-            const updatedFiles = files.map(file => {
-                if (file.name === contextMenu.item.name) {
-                    return { ...file, children: [...file.children, copiedItem.name] };
-                }
-                return file;
-            });
+            const updatedFiles = pasteItem(files, contextMenu.item.name);
             setFiles(updatedFiles);
-            setCopiedItem(null); // Clear clipboard
+            setCopiedItem(null);
         }
         setContextMenu({ ...contextMenu, visible: false });
+    };
+
+    // Helper function to paste item into folder
+    const pasteItem = (items, folderName) => {
+        return items.map(item => {
+            if (item.name === folderName) {
+                return { ...item, children: [...item.children, { ...copiedItem, name: copiedItem.name }] };
+            } else if (item.type === 'folder') {
+                return { ...item, children: pasteItem(item.children, folderName) };
+            }
+            return item;
+        });
     };
 
     // Handle renaming
@@ -77,15 +95,22 @@ const FileList = () => {
     };
 
     const submitRename = () => {
-        const updatedFiles = files.map(file => {
-            if (file.name === renameTarget.name) {
-                return { ...file, name: newName };
-            }
-            return file;
-        });
+        const updatedFiles = renameItem(files, renameTarget.name);
         setFiles(updatedFiles);
         setRenameTarget(null);
         setNewName('');
+    };
+
+    // Helper function to rename item
+    const renameItem = (items, oldName) => {
+        return items.map(item => {
+            if (item.name === oldName) {
+                return { ...item, name: newName };
+            } else if (item.type === 'folder') {
+                return { ...item, children: renameItem(item.children, oldName) };
+            }
+            return item;
+        });
     };
 
     // Collapse all folders
@@ -115,18 +140,25 @@ const FileList = () => {
         }
     };
 
-    // Function to add a new file
+    // Function to add a new file to a folder
     const addFileToFolder = (folderName) => {
         const fileName = prompt('Enter file name:');
         if (fileName) {
-            const updatedFiles = files.map(file => {
-                if (file.name === folderName) {
-                    return { ...file, children: [...file.children, fileName] };
-                }
-                return file;
-            });
+            const updatedFiles = addItemToFolder(files, folderName, { name: fileName, type: 'file' });
             setFiles(updatedFiles);
         }
+    };
+
+    // Helper function to add item to folder
+    const addItemToFolder = (items, folderName, newItem) => {
+        return items.map(item => {
+            if (item.name === folderName) {
+                return { ...item, children: [...item.children, newItem] };
+            } else if (item.type === 'folder') {
+                return { ...item, children: addItemToFolder(item.children, folderName, newItem) };
+            }
+            return item;
+        });
     };
 
     return (
@@ -179,11 +211,11 @@ const FileList = () => {
                                 {file.children && file.children.map((child, i) => (
                                     <li
                                         key={i}
-                                        className={openFile === child ? 'active' : ''}
-                                        onClick={() => handleFileClick(child)}
-                                        onContextMenu={(e) => handleContextMenu(e, { name: child, type: 'file' })}
+                                        className={openFile === child.name ? 'active' : ''}
+                                        onClick={() => handleFileClick(child.name)}
+                                        onContextMenu={(e) => handleContextMenu(e, child)}
                                     >
-                                        {renameTarget && renameTarget.name === child ? (
+                                        {renameTarget && renameTarget.name === child.name ? (
                                             <input
                                                 type="text"
                                                 value={newName}
@@ -192,7 +224,7 @@ const FileList = () => {
                                                 autoFocus
                                             />
                                         ) : (
-                                            child
+                                            child.name
                                         )}
                                     </li>
                                 ))}
@@ -203,26 +235,16 @@ const FileList = () => {
             </ul>
 
             {/* Right-click Context Menu */}
-            {contextMenu.visible && (
-                <div
-                    className="folder-menu"
-                    ref={menuRef}
-                    style={{ top: contextMenu.y, left: contextMenu.x }}
-                >
-                    <div className="folder-menu-item" onClick={handleDelete}>
-                        Delete
-                    </div>
-                    <div className="folder-menu-item" onClick={handleCopy}>
-                        Copy
-                    </div>
-                    <div className={`folder-menu-item ${!copiedItem ? 'disabled' : ''}`} onClick={handlePaste}>
-                        Paste
-                    </div>
-                    <div className="folder-menu-item" onClick={handleRename}>
-                        Rename
-                    </div>
-                </div>
-            )}
+            <div
+                className={`folder-menu ${contextMenu.visible ? 'active' : ''}`}
+                ref={menuRef}
+                style={{ top: contextMenu.y, left: contextMenu.x }}
+            >
+                <div className="folder-menu-item" onClick={handleDelete}>Delete</div>
+                <div className="folder-menu-item" onClick={handleCopy}>Copy</div>
+                <div className={`folder-menu-item ${!copiedItem ? 'disabled' : ''}`} onClick={handlePaste}>Paste</div>
+                <div className="folder-menu-item" onClick={handleRename}>Rename</div>
+            </div>
         </div>
     );
 };

@@ -9,8 +9,8 @@ const App = () => {
         <Router>
             <Routes>
                 <Route path="/" element={<LoginPage />} />
-                <Route path="/main/:username" element={<MainPage />} /> 
-                <Route path="/main/:username/projects" element={<ProjectPage />} /> {/* Updated Project Page route */}
+                <Route path="/main" element={<MainPage />} /> 
+                {/* <Route path="/main/projects" element={<ProjectPage />} /> Updated Project Page route1 */}
             </Routes>
         </Router>
     );

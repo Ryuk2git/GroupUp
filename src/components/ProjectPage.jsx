@@ -1,7 +1,7 @@
 // ProjectPage.jsx
 import React from 'react';
 import FileList from './FileList'; 
-import CodeEditor  from './CodeEditor'; 
+import CodeEditor from './CodeEditor';  // Updated import
 import '../styles/ProjectPage.css'; 
 
 const ProjectPage = () => {
