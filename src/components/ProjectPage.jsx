@@ -1,7 +1,7 @@
 // ProjectPage.jsx
 import React from 'react';
 import FileList from './FileList'; 
-import CodeEditor from './CodeEditor';  // Updated import
+import CodeEditorPage from './CodeEditor';  // Updated import
 import '../styles/ProjectPage.css'; 
 
 const ProjectPage = () => {
@@ -13,7 +13,7 @@ const ProjectPage = () => {
             </div>
             <div className="main-content">
                 <div className="file-display">
-                    <CodeEditor />
+                    <CodeEditorPage />
                 </div>
             </div>
         </div>
