@@ -1,0 +1,246 @@
+.chat-area {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background-color: var(--dark-background);
+    border-radius: 8px;
+    position: relative;
+}
+
+.chat-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px;
+    background-color: var(--medium-gray);
+    border-radius: 8px 8px 0 0;
+}
+
+.chat-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 10px;
+}
+
+.chat-member-name {
+    font-size: 1.2rem;
+    color: var(--accent-white);
+}
+
+.chat-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.call-button, .video-call-button {
+    background-color: var(--accent-yellow);
+    color: var(--dark-background);
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    text-align: center;
+    width: 50px;
+}
+
+.chat-content {
+    flex: 1;
+    padding: 10px;
+    background-color: var(--dark-background);
+    border-radius: 0 0 8px 8px;
+    overflow-y: auto;
+}
+
+.chat-message {
+    background-color: var(--medium-gray);
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    color: var(--accent-white);
+    position: relative;
+}
+
+.chat-input {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    background-color: var(--darker-gray);
+    border-radius: 0 0 8px 8px;
+}
+
+.chat-input textarea {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    background-color: var(--medium-gray);
+    color: var(--accent-white);
+    resize: none;
+}
+
+.add-media {
+    background-color: var(--accent-yellow);
+    color: var(--dark-background);
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 10px;
+    cursor: pointer;
+    font-size: 1.5rem;
+}
+
+.send-message {
+    background-color: var(--accent-yellow);
+    color: var(--dark-background);
+    padding: 10px 15px;
+    border-radius: 5px;
+    margin-left: 10px;
+    cursor: pointer;
+    font-weight: bold;
+    text-align: center;
+}
+
+.chat-area {
+    position: relative;
+    overflow-x: hidden;
+}
+
+.context-menu {
+    position: absolute;
+    background-color: var(--dark-background);
+    border: 1px solid var(--accent-yellow);
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    color: var(--accent-white);
+    display: flex;
+    flex-direction: column;
+}
+
+.context-menu-item {
+    padding: 10px;
+    cursor: pointer;
+}
+
+.context-menu-item:hover {
+    background-color: var(--darker-gray);
+}
+
+/* Voice and Video Call */
+.dropdown {
+    position: absolute;
+    background-color: #333;
+    border-radius: 4px;
+    padding: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    margin-top: 5px;
+}
+
+.dropdown-item {
+    padding: 8px 12px;
+    color: #fff;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.dropdown-item:hover {
+    background-color: #444;
+}
+
+.voice-call-dropdown {
+    position: absolute;
+    top: 75px;
+    right: 10px;
+    width: 300px;
+    background-color: rgba(47, 49, 54, 0.85); /* Translucent effect */
+    border-radius: 15px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+    padding: 20px;
+    z-index: 100;
+  }
+  
+  .voice-call-top {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+  
+  .call-avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background-color: #ccc;
+  }
+  
+  .voice-call-bottom {
+    display: flex;
+    justify-content: space-around;
+  }
+  
+  /* Buttons Styling */
+  .mute-button, .end-call-button, .video-call-button {
+    display: inline-block;
+    padding: 10px;
+    cursor: pointer;
+    height: 40px;
+    width: 40px;
+    background-color: #202225; /* or any color */
+    border-radius: 50%;
+    margin: 0 5px;
+    text-align: center;
+  }
+  
+  .mute-button:hover, .end-call-button:hover, .video-call-button:hover {
+    background-color: #2f3136; /* hover color */
+  }
+  
+  .video-call-dropdown {
+    position: absolute;
+    top: 75px; /* Adjust position as needed */
+    right: 10px;
+    width: 400px; /* Width for video call */
+    background-color: rgba(47, 49, 54, 0.85); /* Translucent effect */
+    border-radius: 15px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+    padding: 20px;
+    z-index: 100;
+}
+
+.video-call-top {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.video-feed {
+    width: 48%; /* Adjust the width of each video feed */
+    height: 200px; /* Set height for video feeds */
+    background-color: #555; /* Placeholder color */
+    border-radius: 8px;
+}
+
+.video-call-bottom {
+    display: flex;
+    justify-content: space-around;
+}
+
+/* Button Styles for Video Call */
+.switch-to-voice-button, .mute-button, .end-call-button {
+    display: inline-block;
+    padding: 10px;
+    cursor: pointer;
+    height: 40px;
+    width: 40px;
+    background-color: #202225; /* or any color */
+    border-radius: 50%;
+    margin: 0 5px;
+    text-align: center;
+}
+
+.switch-to-voice-button:hover, .mute-button:hover, .end-call-button:hover {
+    background-color: #2f3136; /* hover color */
+}

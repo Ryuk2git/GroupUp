@@ -1,0 +1,233 @@
+.example::-webkit-scrollbar {
+    display: none;
+}
+
+.root{
+    /* Dark Theme Colors */
+    --dark-background: #18191a;
+    --darker-gray: #202225;
+    --medium-gray: #2f3136;
+    --light-grey: #D3D3D3;
+
+    /* Accent Colors */
+    --accent-yellow: #fbc531;
+    --accent-light-yellow: #fbeaa7; /* Lighter yellow for hover effect */
+    --accent-white: #ffffff;
+}
+
+.m-container {
+    display: grid;
+    grid-template-columns: 70px auto;
+    gap: 5px;
+    overflow: hidden;
+    color: white;
+}
+
+.column {
+    border: 1px solid white;
+    border-radius: 15px;
+    padding: 5px;
+    height: 100vh;
+}
+
+.box {
+    box-sizing: border-box;
+    border: 1px solid white;
+    border-radius: 10px;
+    padding: 10px;
+    margin-bottom: 10px;
+    text-align: center;
+    cursor: pointer;
+    flex: 1;
+    transition: background-color 0.3s;
+    aspect-ratio: 1/1;
+}
+
+.box:hover {
+    background-color: rgba(255, 255, 255, 0.1); /* Glassmorphism effect */
+}
+
+/* Profile box */
+.profile-box {
+    left: 3px;
+    display: flex;
+    align-items: center;
+    justify-content: center; /* Ensure content is centered inside the circle */
+    cursor: pointer;
+    overflow: hidden;
+    border: 1px solid white;
+    border-radius: 50%; /* Circle shape */
+    padding: 5px;
+    margin-top: auto; /* Push profile box to the bottom */
+    background-color: rgba(255, 255, 255, 0.1); /* Translucent background */
+    width: 50px; /* Initial size for the circle */
+    height: 50px; /* Initial size for the circle */
+    transition: width 0.3s ease, height 0.3s ease, border-radius 0.3s ease; /* Smooth transitions */
+    z-index: 10;
+    position: relative;
+}
+
+/* Expanded state of Profile Box */
+.profile-box.expanded {
+    width: 200px; /* Expanded width */
+    height: 100px; /* Expanded height */
+    border-radius: 10px; /* Transition to rectangle */
+    justify-content: flex-start; /* Align items to the left */
+    padding: 10px;
+    transition: width 0.3s ease, height 0.3s ease, border-radius 0.3s ease; /* Smooth transitions */
+}
+
+/* Profile Picture */
+.profile-pic {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+}
+
+/* Profile details (hidden when collapsed) */
+.profile-details {
+    margin-left: 10px;
+    display: none; /* Hidden by default */
+    flex-direction: column;
+    justify-content: center;
+    color: var(--accent-white);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+/* Show profile details when expanded */
+.profile-box.expanded .profile-details {
+    display: flex; /* Show the details in flex layout */
+    opacity: 1; /* Fade in smoothly */
+}
+
+.profile-details h3, .profile-details p {
+    margin: 0;
+    padding: 0;
+}
+
+.profile-details p {
+    font-size: 0.8rem;
+    color: var(--light-grey);
+}
+
+
+
+/* Message page */
+.message-page {
+    display: flex;
+    height: 100vh;
+}
+  
+.members-list {
+    display: flex;
+    flex-direction: column;
+    width: 25%;
+    background-color: var(--darker-gray);
+    padding: 10px;
+    border-right: 1px solid var(--medium-gray);
+}
+
+.section {
+    display: flex;
+    flex-direction: column;
+    height: 50%;
+    overflow: hidden;
+}
+
+.title-container {
+    border: 2px solid black;
+  border-radius: 10px;
+  padding: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center; 
+  margin-bottom: 10px;
+}
+  
+.title {
+    font-size: 1.2rem;
+    color: var(--accent-white);
+    font-weight: 600;
+}
+
+.add-icon{
+    background-color: var(--accent-yellow);
+    color: var(--dark-background);
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+}
+
+
+.member-item {
+display: flex;
+align-items: center;
+background-color: var(--medium-gray);
+border-radius: 8px;
+padding: 10px;
+margin-bottom: 10px;
+color: var(--accent-white);
+cursor: pointer;
+transition: background-color 0.3s, border 0.3s;
+}
+
+.member-item:hover {
+background-color: var(--light-grey);
+border: 2px solid var(--accent-yellow);
+}
+
+.member-avatar {
+border-radius: 50%;
+width: 40px;
+height: 40px;
+margin-right: 10px;
+}
+
+.member-list-content {
+overflow-y: auto;
+flex: 1;
+}
+
+.chat-area {
+flex: 1;
+padding: 10px;
+background-color: var(--darker-gray);
+color: var(--accent-white);
+}
+  
+.member-item {
+    display: flex;
+    align-items: center;
+    background-color: var(--medium-gray);
+    border: 2px solid transparent;
+    border-radius: 8px;
+    padding: 10px;
+    margin-bottom: 10px;
+    color: var(--accent-white);
+    cursor: pointer;
+    transition: background-color 0.3s, border-color 0.3s, box-shadow 0.3s;
+}
+
+.member-item:hover {
+    background-color: var(--light-grey);
+    border-color: var(--accent-yellow); 
+    box-shadow: 0 0 4px var(--accent-yellow);
+}
+
+.member-avatar {
+    border-radius: 50%;
+    margin-right: 10px;
+}
+
+.chat-area {
+    padding: 10px;
+    background-color: var(--dark-background);
+    color: var(--accent-white);
+    overflow-y: auto;
+}

@@ -1,0 +1,326 @@
+
+.project-container {
+    display: flex;
+    width: 100%;
+    height: 100vh; /* Full height of viewport */
+    overflow: hidden; /* Prevent content from overflowing */
+}
+
+.sidebar {
+    width: 20%; /* Adjusted width to 20% */
+    background-color: #18191a;
+    padding: 10px;
+    box-sizing: border-box;
+    height: 100%; /* Ensure it takes the full height */
+    overflow-y: auto; /* Allow scrolling */
+}
+
+.main-content {
+    width: 80%; /* Adjusted width to 80% */
+    background-color: #ffffff;
+    box-sizing: border-box;
+    height: 100%; /* Ensure it takes the full height */
+    overflow-y: auto; /* Allow scrolling */
+}
+
+/* FileList.css */
+
+.file-list ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.file-list li {
+    padding: 5px 10px;
+    cursor: pointer;
+    color: #ffffff;
+    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+    border: 2px solid transparent; /* Transparent border to prevent layout shifts */
+    box-sizing: border-box; /* Ensure padding and border don't affect total width/height */
+    border-radius: 3px;
+}
+
+.file-list li:hover {
+    background-color: #2f3640;
+    border-color: #fbc531; /* Yellow border on hover */
+}
+
+.file-list li.active {
+    background-color: #fbc531; /* Fill color when clicked */
+    color: #000000; /* Text color when clicked */
+    border-color: #fbc531; /* Yellow border when clicked */
+}
+
+.file-list li.has-error {
+    color: #e84118;
+}
+
+.file-list li.has-error:hover {
+    background-color: #c23616;
+    color: #ffffff;
+}
+
+.file-list li.has-error::after {
+    content: attr(data-errors);
+    background-color: #e84118;
+    color: white;
+    border-radius: 50%;
+    padding: 2px 5px;
+    font-size: 12px;
+    margin-left: 10px;
+}
+
+.folder {
+    margin-bottom: 10px;
+}
+
+.folder-name {
+    display: flex;
+    align-items: center;
+    padding: 5px 10px;
+    position: relative;
+    cursor: pointer;
+    font-weight: bold;
+    background-color: #18191a;
+    color: #ffffff;
+}
+
+.folder-name:hover {
+    background-color: #353b48;
+    color: #f5f6fa;
+}
+
+.folder-arrow {
+    margin-right: 10px;
+    transition: transform 0.3s ease;
+}
+
+.folder-arrow.open {
+    transform: rotate(90deg); /* Arrow pointing down when folder is open */
+}
+
+.folder-add {
+    margin-left: auto;
+    cursor: pointer;
+    font-size: 16px;
+    color: #fbc531;
+}
+
+.folder-contents {
+    overflow: hidden;
+    max-height: 0;
+    opacity: 0;
+    transition: max-height 0.4s ease-out, opacity 0.3s ease-out;
+}
+
+.folder-contents.open {
+    max-height: 300px; /* Adjust based on the size of folder contents */
+    opacity: 1;
+    transition: max-height 0.4s ease-in, opacity 0.3s ease-in;
+}
+
+.controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    padding: 0 10px;
+}
+
+.collapse-all,
+.add-folder {
+    cursor: pointer;
+    font-size: 16px;
+    color: #fbc531;
+    margin-left: 10px;
+}
+
+.collapse-all {
+    flex-grow: 1;
+}
+
+.add-folder {
+    margin-left: auto;
+}
+
+.folder-menu {
+    position: absolute;
+    background-color: #18191a;
+    color: #ffffff;
+    border: 1px solid #353b48;
+    border-radius: 4px;
+    display: none;
+    z-index: 1000;
+    padding: 5px;
+}
+
+.folder-menu.active {
+    display: block;
+}
+
+.folder-menu-item {
+    padding: 8px 12px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.folder-menu-item:hover {
+    background-color: #353b48;
+}
+
+/* Adjusted folder and file styles */
+
+.folder-name {
+    display: flex;
+    align-items: center;
+    padding: 5px 10px;
+    position: relative;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.folder-arrow {
+    margin-right: 10px;
+    transition: transform 0.3s ease;
+}
+
+.folder-arrow.open {
+    transform: rotate(90deg);
+}
+
+.folder-add {
+    margin-left: auto;
+    cursor: pointer;
+    font-size: 16px;
+    color: #fbc531;
+}
+
+.file-list ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.file-list li {
+    padding: 8px;
+    cursor: pointer;
+    color: #ffffff;
+    transition: background-color 0.2s ease;
+}
+
+.file-list li.active {
+    background-color: #fbc531; /* Highlight active file */
+    color: #000000;
+}
+
+.folder-name {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.folder-contents {
+    list-style: none;
+    padding-left: 20px;
+    margin: 5px 0;
+}
+
+.folder-arrow {
+    transition: transform 0.2s ease;
+}
+
+.folder-arrow.open {
+    transform: rotate(90deg);
+}
+
+/* Context Menu */
+.folder-menu {
+    position: absolute;
+    background-color: #18191a;
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+    display: none;
+}
+
+.folder-menu-item {
+    padding: 5px 10px;
+    cursor: pointer;
+}
+
+.folder-menu-item:hover {
+    background-color: #353b48;
+}
+
+.folder-menu.active {
+    display: block;
+}
+
+.folder-menu-item.disabled {
+    color: #7f8fa6;
+    pointer-events: none;
+}
+
+/* Collapse All and Add Folder Controls */
+.controls {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+    background-color: #202225;
+}
+
+.controls span {
+    color: #fbc531;
+    cursor: pointer;
+    font-size: 18px;
+}
+
+/* New changes */
+
+.file-list li {
+    padding: 5px 10px;
+    cursor: pointer;
+    color: #ffffff;
+    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+    border: 2px solid transparent;
+    box-sizing: border-box;
+    border-radius: 3px;
+}
+
+.file-list li:hover {
+    background-color: #2f3640;
+    border-color: #fbc531; /* Updated hover yellow border */
+}
+
+.file-list li.active {
+    background-color: #fbc531;
+    color: #000000;
+    border-color: #fbc531;
+}
+
+.folder-name:hover {
+    background-color: #353b48;
+    color: #fbc531; /* Updated yellow hover */
+}
+
+.collapse-all {
+    cursor: pointer;
+    font-size: 16px;
+    color: #fbc531;
+    padding: 5px 10px;
+}
+
+/* Smooth transition for collapse all functionality */
+.folder-contents {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease-out;
+}
+
+.folder-contents.open {
+    max-height: 300px; /* Adjust the height as needed */
+    transition: max-height 0.4s ease-in;
+}
