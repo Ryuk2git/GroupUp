@@ -6,6 +6,7 @@ Prerequisites
 2. Git: You'll need Git for version control.
 3. MongoDB: The project uses MongoDB for the database, so ensure it's installed and running.
 
+CLoning and starting the porject:
 1. Clone the Project
 First, clone the repository from GitHub to your local machine:
   git clone https://github.com/Ryuk2git/GroupUp.git
