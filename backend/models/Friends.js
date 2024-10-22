@@ -2,7 +2,7 @@
 import { DataTypes } from 'sequelize';
 import sequelize from '../config/database.js'; 
 
-const Friend = sequelize.define('Friend', {
+const Friends = sequelize.define('Friend', {
     // User ID of the first user
     userId: {
         type: DataTypes.INTEGER,
@@ -45,4 +45,4 @@ const Friend = sequelize.define('Friend', {
     tableName: 'friends',
 });
 
-export default Friend;
+export default Friends;

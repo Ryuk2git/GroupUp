@@ -14,9 +14,7 @@ function MemberItem({ member, onClick }) {
 function TitleWithButton({ title, onClick }) {
   return (
     <div className="title-container">
-      <div className="title">
-        {title}
-      </div>
+      <div className="title">{title}</div>
       <div className="add-button" onClick={onClick}>
         <div className="add-icon">+</div>
       </div>
@@ -28,20 +26,21 @@ function MessagePage() {
   const [selectedMember, setSelectedMember] = useState(null);
   const [members, setMembers] = useState([]);
   const [voiceChannels, setVoiceChannels] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filteredMembers, setFilteredMembers] = useState([]);
 
   useEffect(() => {
-    // Fetch members from the API
     const fetchMembers = async () => {
       try {
         const response = await fetch('/api/members'); // Update with your API endpoint
         const data = await response.json();
         setMembers(data.members);
+        setFilteredMembers(data.members); // Initialize filtered members
       } catch (error) {
         console.error('Error fetching members:', error);
       }
     };
 
-    // Fetch voice channels from the API
     const fetchVoiceChannels = async () => {
       try {
         const response = await fetch('/api/voiceChannels'); // Update with your API endpoint
@@ -56,8 +55,21 @@ function MessagePage() {
     fetchVoiceChannels();
   }, []);
 
+  useEffect(() => {
+    // Check if members and searchTerm are set
+    if (members.length > 0 && searchTerm) {
+      const results = members.filter(member =>
+        member.name.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+      setFilteredMembers(results);
+    } else {
+      setFilteredMembers(members); // Reset filtered members if searchTerm is empty
+    }
+  }, [searchTerm, members]);
+
   const handleMemberClick = (member) => {
     setSelectedMember(member);
+    setSearchTerm(''); // Clear the search input after selection
   };
 
   const addNewMember = async () => {
@@ -69,7 +81,7 @@ function MessagePage() {
       };
 
       try {
-        const response = await fetch('/api/members', { // Update with your API endpoint
+        const response = await fetch('/api/members', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(newMember),
@@ -78,6 +90,7 @@ function MessagePage() {
         if (response.ok) {
           const createdMember = await response.json();
           setMembers((prevMembers) => [...prevMembers, createdMember]);
+          setFilteredMembers((prevMembers) => [...prevMembers, createdMember]);
         }
       } catch (error) {
         console.error('Error adding new member:', error);
@@ -94,7 +107,7 @@ function MessagePage() {
       };
 
       try {
-        const response = await fetch('/api/voiceChannels', { // Update with your API endpoint
+        const response = await fetch('/api/voiceChannels', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(newChannel),
@@ -113,10 +126,29 @@ function MessagePage() {
   return (
     <div className="message-page">
       <div className="members-list">
+        <input
+          type="text"
+          placeholder="Search members..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="search-bar"
+        />
+        {/* Dropdown for filtered members */}
+        {filteredMembers.length > 0 && searchTerm && (
+          <div className="dropdown">
+            {filteredMembers.map((member) => (
+              <MemberItem
+                key={member.id}
+                member={member}
+                onClick={handleMemberClick}
+              />
+            ))}
+          </div>
+        )}
         <div className="section">
           <TitleWithButton title="Text Messages" onClick={addNewMember} />
           <div className="member-list-content">
-            {members.map((member) => (
+            {filteredMembers.map((member) => (
               <MemberItem
                 key={member.id}
                 member={member}

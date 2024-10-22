@@ -32,7 +32,7 @@ export const updateMessageStatusController = async (req, res) => {
 // Get messages between two users
 export const getMessagesController = async (req, res) => {
     const { senderId, receiverId } = req.params;
-    const { limit, offset } = req.query; // Get limit and offset for pagination
+    const { limit = 20, offset = 0 } = req.query; // Default values for limit and offset
     try {
         const messages = await getMessages(parseInt(senderId), parseInt(receiverId), parseInt(limit), parseInt(offset));
         res.status(200).json(messages);
@@ -44,7 +44,7 @@ export const getMessagesController = async (req, res) => {
 // Get user chat history
 export const getUserChatHistoryController = async (req, res) => {
     const { userId } = req.params;
-    const { limit, offset } = req.query; // Get limit and offset for pagination
+    const { limit = 50, offset = 0 } = req.query; // Default values for limit and offset
     try {
         const chatHistory = await getUserChatHistory(parseInt(userId), parseInt(limit), parseInt(offset));
         res.status(200).json(chatHistory);

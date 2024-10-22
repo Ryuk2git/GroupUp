@@ -4,13 +4,20 @@ import dotenv from 'dotenv';
 import authRoutes from './routes/authRoutes.js'; // Your auth routes
 import userRoutes from './routes/userRoute.js'; // Import user routes
 import fileRoutes from './routes/fileRoute.js'; // Your file routes
+import chatRoutes from './routes/chatRoute.js'; // Your chat routes
+import messageRoutes from './routes/messageRoute.js'; // Your message routes
 import { Sequelize } from 'sequelize';
+import bodyParser from 'body-parser';
 import morgan from 'morgan'; // For logging HTTP requests
+import http from 'http';
+import { Server } from 'socket.io';
 
-// Load environment variables
+// Load environment variables (if needed, otherwise can be removed)
 dotenv.config();
 
 const app = express();
+const server = http.createServer(app);
+const io = new Server(server); // Initialize Socket.IO with the server
 
 // Middleware
 app.use(express.json()); // Body parser to parse JSON requests
@@ -25,7 +32,9 @@ app.use(cors({
     credentials: true, // Allows cookies or credentials if needed
 }));
 
-// Connect to the database (Assuming you're using Sequelize)
+app.use(bodyParser.json());
+
+// Connect to the database with hard-coded credentials
 const sequelize = new Sequelize('groupproxy', 'root', 'Rishi', {
     host: 'localhost',
     dialect: 'mysql', // or 'postgres', 'sqlite', 'mariadb', etc.
@@ -59,6 +68,8 @@ app.use((req, res, next) => {
 app.use('/api/auth', authRoutes); // Your authentication routes
 app.use('/api/files', fileRoutes); // Your file management routes
 app.use('/api/user', userRoutes); // Add user routes
+app.use('/api/chat', chatRoutes); // Chat Routes
+app.use('/api/messages', messageRoutes); // Use /api/messages for all message routes
 
 // Simple base route
 app.get('/', (req, res) => {
@@ -79,8 +90,19 @@ app.use((err, req, res, next) => {
     res.status(500).send({ error: 'Something went wrong!' });
 });
 
+// Socket.IO connection handling
+io.on('connection', (socket) => {
+    console.log('New client connected');
+
+    // Handle any specific socket events here
+
+    socket.on('disconnect', () => {
+        console.log('Client disconnected');
+    });
+});
+
 // Start server
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
+const PORT = process.env.PORT || 3000; // Use environment variable or hard-coded port
+server.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });

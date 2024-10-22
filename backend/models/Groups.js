@@ -1,15 +1,14 @@
 import { DataTypes } from 'sequelize';
-import sequelize from '../config/database.js'; 
+import sequelize from '../config/database.js';
 
 const Group = sequelize.define('Group', {
+    groupId: {
+        type: DataTypes.STRING, // Use VARCHAR instead of UUID
+        primaryKey: true,
+    },
     groupName: {
         type: DataTypes.STRING,
         allowNull: false,
-        unique: true,
-    },
-    description: {
-        type: DataTypes.TEXT,
-        allowNull: true,
     },
     createdAt: {
         type: DataTypes.DATE,

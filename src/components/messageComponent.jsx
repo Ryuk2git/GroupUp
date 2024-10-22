@@ -1,169 +1,156 @@
 import { useState, useEffect } from 'react';
-import io from 'socket.io-client';
-import '../styles/ChatArea.css';
+import ChatArea from './messageComponent';
+import '../styles/MainPage.css';
 
-const SOCKET_SERVER_URL = 'http://localhost:5000';
+function MemberItem({ member, onClick }) {
+  return (
+    <div className="member-item" onClick={() => onClick(member)}>
+      <img src={member.avatar} alt={member.name} className="member-avatar" />
+      <span>{member.name}</span>
+    </div>
+  );
+}
 
-function ChatArea({ selectedMember, currentUserId }) {
-  const [messages, setMessages] = useState([]);
-  const [messageInput, setMessageInput] = useState('');
-  const [contextMenu, setContextMenu] = useState(null);
-  const [socket, setSocket] = useState(null);
-  const [showVoiceCall, setShowVoiceCall] = useState(false);
-  const [showVideoCall, setShowVideoCall] = useState(false);
+function TitleWithButton({ title, onClick }) {
+  return (
+    <div className="title-container">
+      <div className="title">
+        {title}
+      </div>
+      <div className="add-button" onClick={onClick}>
+        <div className="add-icon">+</div>
+      </div>
+    </div>
+  );
+}
+
+function MessagePage() {
+  const [selectedMember, setSelectedMember] = useState(null);
+  const [friends, setFriends] = useState([]); // Changed from members to friends
+  const [groups, setGroups] = useState([]); // Added for groups
+  const [messages, setMessages] = useState([]); // Store messages for selected member
 
   useEffect(() => {
-    const newSocket = io(SOCKET_SERVER_URL);
-    setSocket(newSocket);
+    // Fetch friends and groups from the API
+    const fetchFriendsAndGroups = async () => {
+      try {
+        const friendsResponse = await fetch('/api/friends'); // Update with your API endpoint for friends
+        const friendsData = await friendsResponse.json();
+        setFriends(friendsData.friends);
 
-    fetchMessages();
+        const groupsResponse = await fetch('/api/groups'); // Update with your API endpoint for groups
+        const groupsData = await groupsResponse.json();
+        setGroups(groupsData.groups);
+      } catch (error) {
+        console.error('Error fetching friends and groups:', error);
+      }
+    };
 
-    newSocket.on('message', (message) => {
-      setMessages((prevMessages) => [...prevMessages, message]);
-    });
+    fetchFriendsAndGroups();
+  }, []);
 
-    return () => newSocket.disconnect();
-  }, [selectedMember]);
-
-  const fetchMessages = async () => {
+  const fetchMessages = async (memberId) => {
     try {
-      const response = await fetch(`/api/messages/${selectedMember.id}`);
+      const response = await fetch(`/api/messages/${memberId}`); // Update with your API endpoint for messages
       const data = await response.json();
-      setMessages(data.messages);
+      setMessages(data.messages); // Store messages for the selected member
     } catch (error) {
       console.error('Error fetching messages:', error);
     }
   };
 
-  const handleSendMessage = async () => {
-    if (messageInput.trim()) {
-      const newMessage = {
-        senderId: currentUserId, // Use the current user's ID
-        receiverId: selectedMember.id,
-        messageContent: messageInput,
+  const handleMemberClick = (member) => {
+    setSelectedMember(member);
+    fetchMessages(member.id); // Fetch messages when member is selected
+  };
+
+  const addNewMember = async () => {
+    const newName = prompt('Enter the name of the new member:');
+    if (newName) {
+      const newMember = {
+        name: newName,
+        avatar: 'https://via.placeholder.com/40',
       };
 
       try {
-        // Send the message to the server
-        const response = await fetch('/api/messages/send', {
+        const response = await fetch('/api/friends', { // Update with your API endpoint for adding friends
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(newMessage),
+          body: JSON.stringify(newMember),
         });
 
         if (response.ok) {
-          socket.emit('message', newMessage);
-          setMessageInput('');
-        } else {
-          const errorData = await response.json();
-          console.error('Error sending message:', errorData);
+          const createdMember = await response.json();
+          setFriends((prevFriends) => [...prevFriends, createdMember]);
         }
       } catch (error) {
-        console.error('Error sending message:', error);
+        console.error('Error adding new member:', error);
       }
     }
   };
 
-  const toggleVoiceCall = () => {
-    setShowVoiceCall(!showVoiceCall);
-  };
+  const addNewGroup = async () => {
+    const newName = prompt('Enter the name of the new group:');
+    if (newName) {
+      const newGroup = {
+        name: newName,
+        avatar: 'https://via.placeholder.com/40',
+      };
 
-  const toggleVideoCall = () => {
-    setShowVoiceCall(false); // Hide voice call
-    setShowVideoCall(true); // Show video call
+      try {
+        const response = await fetch('/api/groups', { // Update with your API endpoint for adding groups
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(newGroup),
+        });
+
+        if (response.ok) {
+          const createdGroup = await response.json();
+          setGroups((prevGroups) => [...prevGroups, createdGroup]);
+        }
+      } catch (error) {
+        console.error('Error adding new group:', error);
+      }
+    }
   };
 
   return (
-    <div className="chat-area">
-      <div className="chat-header">
-        {selectedMember.avatar ? (
-          <img src={selectedMember.avatar} alt={selectedMember.name} className="chat-avatar" />
+    <div className="message-page">
+      <div className="members-list">
+        <div className="section">
+          <TitleWithButton title="Friends" onClick={addNewMember} />
+          <div className="member-list-content">
+            {friends.map((friend) => (
+              <MemberItem
+                key={friend.id}
+                member={friend}
+                onClick={handleMemberClick}
+              />
+            ))}
+          </div>
+        </div>
+        <div className="section">
+          <TitleWithButton title="Groups" onClick={addNewGroup} />
+          <div className="member-list-content">
+            {groups.map((group) => (
+              <MemberItem
+                key={group.id}
+                member={group}
+                onClick={handleMemberClick}
+              />
+            ))}
+          </div>
+        </div>
+      </div>
+      <div className="chat-area">
+        {selectedMember ? (
+          <ChatArea selectedMember={selectedMember} messages={messages} /> // Pass messages to ChatArea
         ) : (
-          <div className="chat-avatar-placeholder">No Avatar</div>
+          <div>Select a member to start chatting</div>
         )}
-        <span className="chat-member-name">{selectedMember.name}</span>
-        <div className="chat-actions">
-          <div className="call-button" onClick={toggleVoiceCall}>Call</div>
-          <div className="video-call-button" onClick={toggleVideoCall}>Video</div>
-        </div>
       </div>
-      <div className="chat-content">
-        {messages.map((message) => (
-          <div key={message.id} className="chat-message">
-            <strong>{message.senderId === currentUserId ? 'You' : selectedMember.name}:</strong> {message.messageContent}
-          </div>
-        ))}
-      </div>
-      <div className="chat-input">
-        <textarea
-          placeholder="Type your message here..."
-          value={messageInput}
-          onChange={(e) => setMessageInput(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
-              e.preventDefault();
-              handleSendMessage();
-            }
-          }}
-        />
-        <div className="add-media">+</div>
-        <div className="send-message" onClick={handleSendMessage}>Send</div>
-      </div>
-      {contextMenu && (
-        <div className="context-menu" style={{ top: `${contextMenu.y}px`, left: `${contextMenu.x}px` }}>
-          <div className="context-menu-item" onClick={() => handleDeleteMessage(contextMenu.messageId)}>
-            Delete Message
-          </div>
-        </div>
-      )}
-
-      {/* Voice Call Dropdown */}
-      {showVoiceCall && (
-        <div className="voice-call-dropdown">
-          <div className="voice-call-top">
-            {selectedMember.avatar ? (
-              <img src={selectedMember.avatar} alt="Caller Avatar" className="call-avatar" />
-            ) : (
-              <div className="call-avatar-placeholder">Caller</div>
-            )}
-            <img src="yourAvatar.png" alt="Your Avatar" className="call-avatar" />
-          </div>
-          <div className="voice-call-bottom">
-            <div className="mute-button" onClick={() => alert('Muted')}>
-              <i className="fas fa-microphone-slash"></i>
-            </div>
-            <div className="end-call-button" onClick={toggleVoiceCall}>
-              <i className="fas fa-phone-slash"></i>
-            </div>
-            <div className="video-call-button" onClick={toggleVideoCall}>
-              <i className="fas fa-video"></i>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Video Call Dropdown */}
-      {showVideoCall && (
-        <div className="video-call-dropdown">
-          <div className="video-call-top">
-            <div className="video-feed"></div>
-            <div className="video-feed"></div>
-          </div>
-          <div className="video-call-bottom">
-            <div className="mute-button" onClick={() => alert('Muted')}>
-              <i className="fas fa-microphone-slash"></i>
-            </div>
-            <div className="end-call-button" onClick={() => setShowVideoCall(false)}>
-              <i className="fas fa-phone-slash"></i>
-            </div>
-            <div className="switch-to-voice-button" onClick={() => { setShowVideoCall(false); setShowVoiceCall(true); }}>
-              <i className="fas fa-phone"></i>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
 
-export default ChatArea;
+export default MessagePage;

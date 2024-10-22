@@ -1,3 +1,4 @@
+// services/messageService.js
 import Message from '../models/Message.js';
 import Friend from '../models/Friends.js';
 import crypto from 'crypto';
@@ -7,7 +8,7 @@ import sequelize from '../config/database.js';  // Added for transaction support
 
 // Encryption Setup
 const algorithm = 'aes-256-cbc'; // Encryption algorithm
-const secretKey = process.env.ENCRYPTION_KEY || 'your-secure-secret-key'; 
+const secretKey = process.env.ENCRYPTION_KEY || 'your-secure-secret-key';
 
 if (secretKey === 'your-secure-secret-key') {
     console.error('Warning: Using an insecure default encryption key. Set ENCRYPTION_KEY in the environment variables.');
@@ -55,12 +56,12 @@ export const sendMessage = async (senderId, receiverId, messageContent) => {
             status: 'sent',
         }, { transaction });
 
-        // Update both sender and receiver's Friend relationship
-        await Friend.update({ messageId: message.messageId }, {
+        // Update both sender and receiver's Friend relationship (if necessary)
+        await Friend.update({ lastMessageId: message.messageId }, {
             where: { userId: senderId, friendId: receiverId },
         }, { transaction });
 
-        await Friend.update({ messageId: message.messageId }, {
+        await Friend.update({ lastMessageId: message.messageId }, {
             where: { userId: receiverId, friendId: senderId },
         }, { transaction });
 
@@ -132,7 +133,7 @@ export const getMessages = async (senderId, receiverId, limit = 20, offset = 0) 
                 receiverId: message.receiverId,
                 messageContent: decryptedMessage,
                 status: message.status,
-                sentAt: message.sentAt || message.createdAt,
+                sentAt: message.createdAt,
             };
         });
     } catch (error) {
@@ -162,7 +163,7 @@ export const getUserChatHistory = async (userId, limit = 50, offset = 0) => {
                 receiverId: message.receiverId,
                 messageContent: decryptedMessage,
                 status: message.status,
-                sentAt: message.sentAt || message.createdAt,
+                sentAt: message.createdAt,
             };
         });
     } catch (error) {
@@ -191,5 +192,28 @@ export const deleteMessage = async (messageId) => {
     } catch (error) {
         console.error('Error deleting message:', error);
         throw new Error('Could not delete message');
+    }
+};
+
+export const searchFriendsByName = async (userId, name) => {
+    try {
+        // Fetch friends matching the given name
+        const friends = await Friend.findAll({
+            where: {
+                userId, // Ensure you're searching for the user's friends
+                '$User.name$': { 
+                    [Op.like]: `%${name}%` // Use SQL LIKE for partial matching
+                }
+            },
+            include: [{
+                model: User, // Assuming you have a User model to join on
+                attributes: ['name'], // Select only the name attribute
+            }],
+        });
+
+        return friends.map(friend => friend.User.name); // Return an array of friend names
+    } catch (error) {
+        console.error('Error searching for friends:', error);
+        throw new Error('Failed to search for friends');
     }
 };
