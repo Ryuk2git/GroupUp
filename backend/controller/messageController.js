@@ -1,65 +1,66 @@
-import {
-    sendMessage,
-    updateMessageStatus,
-    getMessages,
-    getUserChatHistory,
-    deleteMessage
-} from '../services/messageService.js';
+import * as messageService from '../services/messageService.js';
 
 // Send a message
-export const sendMessageController = async (req, res) => {
+export const sendMessage = async (req, res) => {
     const { senderId, receiverId, messageContent } = req.body;
+
     try {
-        const message = await sendMessage(senderId, receiverId, messageContent);
-        res.status(201).json(message);
+        const message = await messageService.sendMessage(senderId, receiverId, messageContent);
+        res.status(200).json(message);
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        console.error('Error sending message:', error);
+        res.status(500).json({ message: 'Failed to send message' });
     }
 };
 
 // Update message status
-export const updateMessageStatusController = async (req, res) => {
-    const { status } = req.body;
-    const { messageId } = req.params;
+export const updateMessageStatus = async (req, res) => {
+    const { messageId, status } = req.body;
+
     try {
-        await updateMessageStatus(messageId, status);
-        res.status(200).json({ message: 'Message status updated successfully.' });
+        await messageService.updateMessageStatus(messageId, status);
+        res.status(200).json({ message: 'Message status updated successfully' });
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        console.error('Error updating message status:', error);
+        res.status(500).json({ message: 'Failed to update message status' });
     }
 };
 
 // Get messages between two users
-export const getMessagesController = async (req, res) => {
+export const getMessages = async (req, res) => {
     const { senderId, receiverId } = req.params;
-    const { limit = 20, offset = 0 } = req.query; // Default values for limit and offset
+    
     try {
-        const messages = await getMessages(parseInt(senderId), parseInt(receiverId), parseInt(limit), parseInt(offset));
+        const messages = await messageService.getMessages(senderId, receiverId);
         res.status(200).json(messages);
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        console.error('Error retrieving messages:', error);
+        res.status(500).json({ message: 'Failed to retrieve messages' });
     }
 };
 
-// Get user chat history
-export const getUserChatHistoryController = async (req, res) => {
-    const { userId } = req.params;
-    const { limit = 50, offset = 0 } = req.query; // Default values for limit and offset
+// Fetch user chat history
+export const getUserChatHistory = async (req, res) => {
+    const userId = req.params.userId;
+
     try {
-        const chatHistory = await getUserChatHistory(parseInt(userId), parseInt(limit), parseInt(offset));
+        const chatHistory = await messageService.getUserChatHistory(userId);
         res.status(200).json(chatHistory);
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        console.error('Error fetching chat history:', error);
+        res.status(500).json({ message: 'Could not fetch chat history' });
     }
 };
 
 // Delete a message
-export const deleteMessageController = async (req, res) => {
+export const deleteMessage = async (req, res) => {
     const { messageId } = req.params;
+
     try {
-        const deletedMessage = await deleteMessage(messageId);
-        res.status(200).json({ message: 'Message deleted successfully.', deletedMessage });
+        const deletedMessage = await messageService.deleteMessage(messageId);
+        res.status(200).json(deletedMessage);
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        console.error('Error deleting message:', error);
+        res.status(500).json({ message: 'Could not delete message' });
     }
 };

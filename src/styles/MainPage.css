@@ -253,9 +253,73 @@ color: var(--accent-white);
     margin-right: 10px;
 }
 
+/* Chat Area Styles */
 .chat-area {
+    flex: 1;
     padding: 10px;
-    background-color: var(--dark-background);
+    background-color: var(--darker-gray);
     color: var(--accent-white);
     overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px; /* Space between messages */
+}
+
+/* Message Styles */
+.message {
+    display: flex;
+    flex-direction: column; /* Align timestamp and message vertically */
+    max-width: 75%; /* Limit message width */
+    padding: 10px;
+    border-radius: 15px; /* Rounded corners */
+    margin: 5px 0; /* Space between messages */
+}
+
+/* Sender Message Style */
+.message.sender {
+    align-self: flex-end; /* Align to the right for sender */
+    background-color: var(--accent-yellow); /* Message bubble color for sender */
+    color: var(--dark-background); /* Text color for sender */
+}
+
+/* Receiver Message Style */
+.message.receiver {
+    align-self: flex-start; /* Align to the left for receiver */
+    background-color: var(--medium-gray); /* Message bubble color for receiver */
+    color: var(--accent-white); /* Text color for receiver */
+}
+
+/* Message Text */
+.message-content {
+    line-height: 1.4; /* Improve readability */
+}
+
+/* Timestamp Style */
+.timestamp {
+    font-size: 0.8rem; /* Smaller text for timestamp */
+    color: var(--light-grey);
+    margin-top: 5px; /* Space above timestamp */
+    align-self: flex-end; /* Align timestamp to the right */
+}
+
+/* Avatar for Sender and Receiver */
+.message-avatar {
+    border-radius: 50%;
+    width: 30px; /* Avatar size */
+    height: 30px; /* Avatar size */
+    margin-right: 10px; /* Space between avatar and message */
+}
+
+/* Scrollbar Styles (Optional) */
+.chat-area::-webkit-scrollbar {
+    width: 8px; /* Width of the scrollbar */
+}
+
+.chat-area::-webkit-scrollbar-thumb {
+    background: var(--accent-yellow); /* Color of the scrollbar thumb */
+    border-radius: 10px; /* Rounded corners for the thumb */
+}
+
+.chat-area::-webkit-scrollbar-track {
+    background: var(--medium-gray); /* Background of the scrollbar track */
 }

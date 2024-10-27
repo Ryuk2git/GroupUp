@@ -1,10 +1,9 @@
-// services/messageService.js
 import Message from '../models/Message.js';
 import Friend from '../models/Friends.js';
 import crypto from 'crypto';
 import { Op } from 'sequelize';
 import { Server } from 'socket.io';
-import sequelize from '../config/database.js';  // Added for transaction support
+import sequelize from '../config/database.js'; // For transaction support
 
 // Encryption Setup
 const algorithm = 'aes-256-cbc'; // Encryption algorithm
@@ -14,10 +13,10 @@ if (secretKey === 'your-secure-secret-key') {
     console.error('Warning: Using an insecure default encryption key. Set ENCRYPTION_KEY in the environment variables.');
 }
 
-// Initialize Socket.IO (to be passed from the main server file)
+// Initialize Socket.IO instance
 let io;
 
-// Set Socket.IO instance
+// Function to set Socket.IO instance
 export const setSocketIO = (socketIO) => {
     io = socketIO;
 };
@@ -41,7 +40,7 @@ const decryptMessage = (encryptedContent) => {
     return decrypted;
 };
 
-// Send an encrypted message with Transaction handling
+// Send an encrypted message with transaction handling
 export const sendMessage = async (senderId, receiverId, messageContent) => {
     const transaction = await sequelize.transaction(); // Start transaction
 
@@ -56,12 +55,12 @@ export const sendMessage = async (senderId, receiverId, messageContent) => {
             status: 'sent',
         }, { transaction });
 
-        // Update both sender and receiver's Friend relationship (if necessary)
-        await Friend.update({ lastMessageId: message.messageId }, {
+        // Update both sender and receiver's Friend relationship
+        await Friend.update({ messageId: message.messageId }, {
             where: { userId: senderId, friendId: receiverId },
         }, { transaction });
 
-        await Friend.update({ lastMessageId: message.messageId }, {
+        await Friend.update({ messageId: message.messageId }, {
             where: { userId: receiverId, friendId: senderId },
         }, { transaction });
 
@@ -109,7 +108,7 @@ export const updateMessageStatus = async (messageId, status) => {
     }
 };
 
-// Retrieve and decrypt messages between two users with Pagination support
+// Retrieve and decrypt messages between two users with pagination support
 export const getMessages = async (senderId, receiverId, limit = 20, offset = 0) => {
     try {
         const messages = await Message.findAll({
@@ -133,7 +132,7 @@ export const getMessages = async (senderId, receiverId, limit = 20, offset = 0) 
                 receiverId: message.receiverId,
                 messageContent: decryptedMessage,
                 status: message.status,
-                sentAt: message.createdAt,
+                sentAt: message.sentAt || message.createdAt,
             };
         });
     } catch (error) {
@@ -163,7 +162,7 @@ export const getUserChatHistory = async (userId, limit = 50, offset = 0) => {
                 receiverId: message.receiverId,
                 messageContent: decryptedMessage,
                 status: message.status,
-                sentAt: message.createdAt,
+                sentAt: message.sentAt || message.createdAt,
             };
         });
     } catch (error) {
@@ -192,28 +191,5 @@ export const deleteMessage = async (messageId) => {
     } catch (error) {
         console.error('Error deleting message:', error);
         throw new Error('Could not delete message');
-    }
-};
-
-export const searchFriendsByName = async (userId, name) => {
-    try {
-        // Fetch friends matching the given name
-        const friends = await Friend.findAll({
-            where: {
-                userId, // Ensure you're searching for the user's friends
-                '$User.name$': { 
-                    [Op.like]: `%${name}%` // Use SQL LIKE for partial matching
-                }
-            },
-            include: [{
-                model: User, // Assuming you have a User model to join on
-                attributes: ['name'], // Select only the name attribute
-            }],
-        });
-
-        return friends.map(friend => friend.User.name); // Return an array of friend names
-    } catch (error) {
-        console.error('Error searching for friends:', error);
-        throw new Error('Failed to search for friends');
     }
 };

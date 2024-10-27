@@ -24,4 +24,15 @@ router.get('/user', authService.authenticateRequest, async (req, res) => {
     }
 });
 
+// Route to fetch user members
+router.get('/members', authService.authenticateRequest, async (req, res) => {
+    try {
+        // Assuming you have a method to fetch members
+        const members = await User.findAll(); // Replace with actual logic for fetching members
+        res.json({ members });
+    } catch (error) {
+        res.status(500).json({ msg: 'Server error', error });
+    }
+});
+
 export default router;

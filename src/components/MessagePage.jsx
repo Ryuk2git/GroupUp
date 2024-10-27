@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import ChatArea from './messageComponent';
+import ChatArea from './ChatArea';
 import '../styles/MainPage.css';
 
 function MemberItem({ member, onClick }) {
@@ -26,16 +26,19 @@ function MessagePage() {
   const [selectedMember, setSelectedMember] = useState(null);
   const [members, setMembers] = useState([]);
   const [voiceChannels, setVoiceChannels] = useState([]);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
   const [filteredMembers, setFilteredMembers] = useState([]);
+  const [showDropdown, setShowDropdown] = useState(false);
 
   useEffect(() => {
     const fetchMembers = async () => {
       try {
-        const response = await fetch('/api/members'); // Update with your API endpoint
+        const response = await fetch('/api/members');
+        if (!response.ok) {
+          throw new Error('Failed to fetch members');
+        }
         const data = await response.json();
-        setMembers(data.members);
-        setFilteredMembers(data.members); // Initialize filtered members
+        setMembers(data); // Update this based on the API response structure
       } catch (error) {
         console.error('Error fetching members:', error);
       }
@@ -43,9 +46,12 @@ function MessagePage() {
 
     const fetchVoiceChannels = async () => {
       try {
-        const response = await fetch('/api/voiceChannels'); // Update with your API endpoint
+        const response = await fetch('/api/voiceChannels');
+        if (!response.ok) {
+          throw new Error('Failed to fetch voice channels');
+        }
         const data = await response.json();
-        setVoiceChannels(data.channels);
+        setVoiceChannels(data); // Update this based on the API response structure
       } catch (error) {
         console.error('Error fetching voice channels:', error);
       }
@@ -56,20 +62,17 @@ function MessagePage() {
   }, []);
 
   useEffect(() => {
-    // Check if members and searchTerm are set
-    if (members.length > 0 && searchTerm) {
-      const results = members.filter(member =>
-        member.name.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-      setFilteredMembers(results);
-    } else {
-      setFilteredMembers(members); // Reset filtered members if searchTerm is empty
-    }
-  }, [searchTerm, members]);
+    const filtered = members.filter((member) =>
+      member.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+    setFilteredMembers(filtered);
+    setShowDropdown(!!searchQuery && filtered.length > 0);
+  }, [searchQuery, members]);
 
   const handleMemberClick = (member) => {
     setSelectedMember(member);
-    setSearchTerm(''); // Clear the search input after selection
+    setShowDropdown(false); 
+    setSearchQuery(''); 
   };
 
   const addNewMember = async () => {
@@ -90,7 +93,8 @@ function MessagePage() {
         if (response.ok) {
           const createdMember = await response.json();
           setMembers((prevMembers) => [...prevMembers, createdMember]);
-          setFilteredMembers((prevMembers) => [...prevMembers, createdMember]);
+        } else {
+          throw new Error('Failed to create new member');
         }
       } catch (error) {
         console.error('Error adding new member:', error);
@@ -116,6 +120,8 @@ function MessagePage() {
         if (response.ok) {
           const createdChannel = await response.json();
           setVoiceChannels((prevChannels) => [...prevChannels, createdChannel]);
+        } else {
+          throw new Error('Failed to create new voice channel');
         }
       } catch (error) {
         console.error('Error adding new voice channel:', error);
@@ -126,31 +132,12 @@ function MessagePage() {
   return (
     <div className="message-page">
       <div className="members-list">
-        <input
-          type="text"
-          placeholder="Search members..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="search-bar"
-        />
-        {/* Dropdown for filtered members */}
-        {filteredMembers.length > 0 && searchTerm && (
-          <div className="dropdown">
-            {filteredMembers.map((member) => (
-              <MemberItem
-                key={member.id}
-                member={member}
-                onClick={handleMemberClick}
-              />
-            ))}
-          </div>
-        )}
         <div className="section">
           <TitleWithButton title="Text Messages" onClick={addNewMember} />
           <div className="member-list-content">
-            {filteredMembers.map((member) => (
+            {members.map((member) => (
               <MemberItem
-                key={member.id}
+                key={member.id} // Ensure you're using the correct property for ID
                 member={member}
                 onClick={handleMemberClick}
               />
@@ -162,7 +149,7 @@ function MessagePage() {
           <div className="member-list-content">
             {voiceChannels.map((channel) => (
               <MemberItem
-                key={channel.id}
+                key={channel.id} // Ensure you're using the correct property for ID
                 member={channel}
                 onClick={handleMemberClick}
               />

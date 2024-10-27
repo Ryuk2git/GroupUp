@@ -4,13 +4,16 @@ import dotenv from 'dotenv';
 import authRoutes from './routes/authRoutes.js'; // Your auth routes
 import userRoutes from './routes/userRoute.js'; // Import user routes
 import fileRoutes from './routes/fileRoute.js'; // Your file routes
-import chatRoutes from './routes/chatRoute.js'; // Your chat routes
-import messageRoutes from './routes/messageRoute.js'; // Your message routes
+import conversationRoutes from './routes/conversationRoute.js'; // Import conversation routes
+import messageRoutes from './routes/messageRoute.js'; // Import message routes
+import memberRoute from './routes/memberRoute.js';
 import { Sequelize } from 'sequelize';
 import bodyParser from 'body-parser';
 import morgan from 'morgan'; // For logging HTTP requests
 import http from 'http';
 import { Server } from 'socket.io';
+import Conversations from './models/Conversations.js';
+import Message from './models/Message.js';
 
 // Load environment variables (if needed, otherwise can be removed)
 dotenv.config();
@@ -31,8 +34,6 @@ app.use(cors({
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     credentials: true, // Allows cookies or credentials if needed
 }));
-
-app.use(bodyParser.json());
 
 // Connect to the database with hard-coded credentials
 const sequelize = new Sequelize('groupproxy', 'root', 'Rishi', {
@@ -68,8 +69,9 @@ app.use((req, res, next) => {
 app.use('/api/auth', authRoutes); // Your authentication routes
 app.use('/api/files', fileRoutes); // Your file management routes
 app.use('/api/user', userRoutes); // Add user routes
-app.use('/api/chat', chatRoutes); // Chat Routes
-app.use('/api/messages', messageRoutes); // Use /api/messages for all message routes
+app.use('/api/conversations', conversationRoutes); // Add conversations route
+app.use('/api/messages', messageRoutes); // Add messages route
+app.use('/api/members', memberRoute);
 
 // Simple base route
 app.get('/', (req, res) => {
@@ -94,7 +96,15 @@ app.use((err, req, res, next) => {
 io.on('connection', (socket) => {
     console.log('New client connected');
 
-    // Handle any specific socket events here
+    socket.on('message', async (message) => {
+        // Save the message to the database
+        const newMessage = await Message.create(message);
+        io.to(message.conversationId).emit('message', newMessage); // Broadcast to all clients in the conversation
+    });
+
+    socket.on('joinConversation', (conversationId) => {
+        socket.join(conversationId); // Join the conversation room
+    });
 
     socket.on('disconnect', () => {
         console.log('Client disconnected');
