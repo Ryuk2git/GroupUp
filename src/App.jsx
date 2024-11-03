@@ -1,5 +1,6 @@
 // App.jsx
 import React, { useState, useEffect } from 'react';
+import { AuthProvider } from './context/AuthContext.jsx';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import LoginPage from './components/Loginpage';
 import MainPage from './components/MainPage';
@@ -30,13 +31,15 @@ const App = () => {
     }, []); // Run once on component mount
 
     return (
-        <Router>
-            <Routes>
-                <Route path="/" element={<LoginPage />} />
-                <Route path="/main" element={<MainPage userProfile={userProfile} setUserProfile={setUserProfile} />} />
-                {/* <Route path="/main/projects" element={<ProjectPage />} /> Updated Project Page route */ }
-            </Routes>
-        </Router>
+        <AuthProvider>
+            <Router>
+                <Routes>
+                    <Route path="/" element={<LoginPage />} />
+                    <Route path="/main" element={<MainPage userProfile={userProfile} setUserProfile={setUserProfile} />} />
+                    {/* <Route path="/main/projects" element={<ProjectPage />} /> Updated Project Page route */ }
+                </Routes>
+            </Router>
+        </AuthProvider>
     );
 };
 

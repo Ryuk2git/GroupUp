@@ -7,34 +7,47 @@ import '../styles/MainPage.css';
 
 function MainPage() {
     const [activeComponent, setActiveComponent] = useState('MessagePage');
-    const [userProfile, setUserProfile] = useState(null); // Initialize as null to fetch dynamically
+    const [userProfile, setUserProfile] = useState(null); 
+    const [friends, setFriends] = useState([]); // State for friends
+    const [projects, setProjects] = useState([]); // State for projects
+    const [loading, setLoading] = useState(true); // Loading state
 
     useEffect(() => {
         const fetchUserProfile = async () => {
-            const token = localStorage.getItem('token'); // Get the token from local storage
+            setLoading(true); // Start loading
+            const token = localStorage.getItem('token'); 
             if (!token) {
                 console.error('No token found. User is not authenticated.');
-                return; // Exit if no token
+                setLoading(false);
+                return; 
             }
 
             try {
-                const userData = await fetchUserData(); // Fetch user data
-                setUserProfile(userData.user); // Update userProfile with fetched data
+                const userData = await fetchUserData(); 
+                setUserProfile(userData.user); 
+                setFriends(userData.friends); // Assuming the API returns friends
+                setProjects(userData.projects); // Assuming the API returns projects
             } catch (error) {
                 console.error('Error fetching user data:', error);
+            } finally {
+                setLoading(false); // End loading
             }
         };
 
-        fetchUserProfile(); // Call function to fetch user profile
-    }, []); // Empty dependency array to run only once when component mounts
+        fetchUserProfile(); 
+    }, []); 
 
     const handleLogoClick = () => { /* Logic for App Logo click */ };
     const handleDMClick = () => setActiveComponent('MessagePage');
     const handleProjectClick = () => setActiveComponent('ProjectPage');
     const handleProfileClick = () => { /* Handle profile click if needed */ };
 
-    if (!userProfile) {
+    if (loading) {
         return <div>Loading...</div>; // Show a loading state while fetching data
+    }
+
+    if (!userProfile) {
+        return <div>No user profile available.</div>; // Handle case when no user profile
     }
 
     return (
@@ -47,7 +60,7 @@ function MainPage() {
                 userProfile={userProfile} // Pass user profile to HomeBar
             />
             <div className="column">
-                {activeComponent === 'MessagePage' ? <MessagePage /> : <ProjectPage />}
+                {activeComponent === 'MessagePage' ? <MessagePage userProfile={userProfile} friends={friends} /> : <ProjectPage projects={projects} />}
             </div>
         </div>
     );

@@ -138,12 +138,13 @@
 
 .title-container {
     border: 2px solid black;
-  border-radius: 10px;
-  padding: 10px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center; 
-  margin-bottom: 10px;
+    border-radius: 10px;
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center; 
+    margin-bottom: 10px;
+    position: relative;
 }
   
 .title {
@@ -166,11 +167,31 @@
 
 
 .search-bar {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 15px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
+    display: none; /* Hide by default */
+    position: absolute; /* Position it below the title and button */
+    width: 100%; /* Full width */
+    top: 100%; /* Position below the title */
+    left: 0; /* Align to left */
+    margin-top: 5px; /* Some space from the title */
+    padding: 8px; /* Padding for the search input */
+    border: 1px solid #ccc; /* Add border */
+    border-radius: 4px; /* Rounded corners */
+    z-index: 100; /* Ensure it appears above other elements */
+}
+.title-container .search-bar {
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden; /* Hides the bar when not visible */
+}
+
+.title-container .search-bar.show {
+    max-height: 50px; /* Adjust as needed */
+    opacity: 1;
+    transition: max-height 0.5s ease, opacity 0.5s ease;
+}
+
+.search-bar.visible {
+    display: block; /* Show when needed */
 }
 
 .dropdown {

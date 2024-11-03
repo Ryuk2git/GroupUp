@@ -7,12 +7,12 @@ import fileRoutes from './routes/fileRoute.js'; // Your file routes
 import conversationRoutes from './routes/conversationRoute.js'; // Import conversation routes
 import messageRoutes from './routes/messageRoute.js'; // Import message routes
 import memberRoute from './routes/memberRoute.js';
+import friendsRoute from './routes/friendsRoute.js';
 import { Sequelize } from 'sequelize';
 import bodyParser from 'body-parser';
 import morgan from 'morgan'; // For logging HTTP requests
 import http from 'http';
 import { Server } from 'socket.io';
-import Conversations from './models/Conversations.js';
 import Message from './models/Message.js';
 
 // Load environment variables (if needed, otherwise can be removed)
@@ -72,6 +72,7 @@ app.use('/api/user', userRoutes); // Add user routes
 app.use('/api/conversations', conversationRoutes); // Add conversations route
 app.use('/api/messages', messageRoutes); // Add messages route
 app.use('/api/members', memberRoute);
+app.use('/api/friends', friendsRoute); // Add friends route
 
 // Simple base route
 app.get('/', (req, res) => {
@@ -92,9 +93,37 @@ app.use((err, req, res, next) => {
     res.status(500).send({ error: 'Something went wrong!' });
 });
 
+// Message route for fetching messages (use your database connection here)
+app.get('/api/messages/:receiverId', async (req, res) => {
+    const { receiverId } = req.params;
+    try {
+      const messages = await Message.findAll({
+        where: { receiverId },
+        order: [['createdAt', 'ASC']],
+      });
+      res.json({ messages });
+    } catch (error) {
+      console.error('Error fetching messages:', error);
+      res.status(500).send('Server error');
+    }
+  });
+  
+// Message route for sending messages
+app.post('/api/messages/send', async (req, res) => {
+    const { senderId, receiverId, messageContent } = req.body;
+    try {
+        const newMessage = await Message.create({ senderId, receiverId, messageContent });
+        io.emit('message', newMessage); // Send to all connected clients
+        res.status(200).json(newMessage);
+    } catch (error) {
+        console.error('Error sending message:', error);
+        res.status(500).send('Server error');
+    }
+});  
+
 // Socket.IO connection handling
 io.on('connection', (socket) => {
-    console.log('New client connected');
+    console.log('New client connected: ' + socket.id);
 
     socket.on('message', async (message) => {
         // Save the message to the database
@@ -107,7 +136,7 @@ io.on('connection', (socket) => {
     });
 
     socket.on('disconnect', () => {
-        console.log('Client disconnected');
+        console.log('Client disconnected: ' +  socket.id);
     });
 });
 

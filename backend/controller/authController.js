@@ -101,7 +101,7 @@ export const registerUser = async (req, res) => {
         };
 
         // Sign the JWT token
-        const token = jwt.sign(payload, privateKey, { expiresIn: '1h' });
+        const token = jwt.sign(payload, privateKey, { expiresIn: '1d' });
 
         res.status(201).json({ token });
     } catch (error) {

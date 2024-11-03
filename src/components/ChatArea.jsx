@@ -1,5 +1,8 @@
 import { useState, useEffect } from 'react';
 import io from 'socket.io-client';
+import { fetchMembers, fetchMessages, sendMessage, fetchUserData } from '../utils/api.js';
+import { collection, query, orderBy, onSnapshot, addDoc } from "firebase/firestore";
+import { db } from "../../backend/config/firebase.js"; // Update with the correct path
 import '../styles/ChatArea.css';
 
 const SOCKET_SERVER_URL = 'http://localhost:5000';

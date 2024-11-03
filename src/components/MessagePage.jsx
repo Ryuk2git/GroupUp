@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import ChatArea from './ChatArea';
+import { fetchMembers, fetchVoiceChannels, addNewMember, addNewVoiceChannel, fetchFriends } from '../utils/api.js'; // Updated imports
 import '../styles/MainPage.css';
 
 function MemberItem({ member, onClick }) {
@@ -11,120 +12,114 @@ function MemberItem({ member, onClick }) {
   );
 }
 
-function TitleWithButton({ title, onClick }) {
+function TitleWithButton({ title, onClick, showSearch, setShowSearch, onSearchChange, searchQuery }) {
   return (
     <div className="title-container">
       <div className="title">{title}</div>
       <div className="add-button" onClick={onClick}>
         <div className="add-icon">+</div>
       </div>
+      <input
+        type="text"
+        className={`search-bar ${showSearch ? 'visible' : ''}`} // Use conditional class
+        value={searchQuery}
+        onChange={onSearchChange}
+        placeholder="Search for members..."
+        onFocus={() => setShowSearch(true)} // Show on focus
+        onBlur={() => setShowSearch(false)} // Hide on blur
+      />
     </div>
   );
 }
 
-function MessagePage() {
+function MessagePage({ userProfile }) {
   const [selectedMember, setSelectedMember] = useState(null);
   const [members, setMembers] = useState([]);
   const [voiceChannels, setVoiceChannels] = useState([]);
+  const [friends, setFriends] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredMembers, setFilteredMembers] = useState([]);
-  const [showDropdown, setShowDropdown] = useState(false);
+  const [showSearch, setShowSearch] = useState(false);
+  const localToken = localStorage.getItem('token');
 
   useEffect(() => {
-    const fetchMembers = async () => {
-      try {
-        const response = await fetch('/api/members');
-        if (!response.ok) {
-          throw new Error('Failed to fetch members');
-        }
-        const data = await response.json();
-        setMembers(data); // Update this based on the API response structure
-      } catch (error) {
-        console.error('Error fetching members:', error);
+    const loadMembers = async () => {
+      const token = localStorage.getItem('token');
+      if (!localToken) {
+        console.error("No auth token found");
+        return;
       }
+      const membersData = await fetchMembers();
+      setMembers(membersData);
     };
 
-    const fetchVoiceChannels = async () => {
-      try {
-        const response = await fetch('/api/voiceChannels');
-        if (!response.ok) {
-          throw new Error('Failed to fetch voice channels');
-        }
-        const data = await response.json();
-        setVoiceChannels(data); // Update this based on the API response structure
-      } catch (error) {
-        console.error('Error fetching voice channels:', error);
-      }
-    };
+    // const loadVoiceChannels = async () => {
+    //   const channelsData = await fetchVoiceChannels();
+    //   setVoiceChannels(channelsData);
+    // };
 
-    fetchMembers();
-    fetchVoiceChannels();
-  }, []);
+    const loadFriends = async () => {
+      const token = localStorage.getItem('token'); // Retrieve the token
+      console.log("Friends token: " + token);
+      if (!token) {
+          console.error("No auth token found");
+          return;
+      }
+      try {
+          const friendsData = await fetchFriends(localToken); // Pass token to fetchFriends
+          setFriends(friendsData);
+      } catch (error) {
+          console.error("Failed to load friends:", error);
+      }
+  };
+
+    loadMembers();
+    // loadVoiceChannels();
+    loadFriends();
+    console.log("token in the MessagePage Function: " + localToken );
+  }, [localToken]);
 
   useEffect(() => {
     const filtered = members.filter((member) =>
-      member.name.toLowerCase().includes(searchQuery.toLowerCase())
+      member?.name?.toLowerCase().includes(searchQuery.toLowerCase())
     );
     setFilteredMembers(filtered);
-    setShowDropdown(!!searchQuery && filtered.length > 0);
   }, [searchQuery, members]);
 
   const handleMemberClick = (member) => {
     setSelectedMember(member);
-    setShowDropdown(false); 
-    setSearchQuery(''); 
+    setSearchQuery('');
+    setShowSearch(false);
   };
 
-  const addNewMember = async () => {
-    const newName = prompt('Enter the name of the new member:');
-    if (newName) {
+  const handleAddNewMember = async () => {
+    if (searchQuery) {
       const newMember = {
-        name: newName,
+        name: searchQuery,
         avatar: 'https://via.placeholder.com/40',
       };
 
-      try {
-        const response = await fetch('/api/members', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(newMember),
-        });
-
-        if (response.ok) {
-          const createdMember = await response.json();
-          setMembers((prevMembers) => [...prevMembers, createdMember]);
-        } else {
-          throw new Error('Failed to create new member');
-        }
-      } catch (error) {
-        console.error('Error adding new member:', error);
+      const createdMember = await addNewMember(newMember);
+      if (createdMember) {
+        setMembers((prevMembers) => [...prevMembers, createdMember]);
+        setSearchQuery(''); // Clear the search query
+        setShowSearch(false); // Hide the search bar
       }
     }
   };
 
-  const addNewVoiceChannel = async () => {
-    const newName = prompt('Enter the name of the new voice channel:');
-    if (newName) {
+  const handleAddNewVoiceChannel = async () => {
+    if (searchQuery) {
       const newChannel = {
-        name: newName,
+        name: searchQuery,
         avatar: 'https://via.placeholder.com/40',
       };
 
-      try {
-        const response = await fetch('/api/voiceChannels', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(newChannel),
-        });
-
-        if (response.ok) {
-          const createdChannel = await response.json();
-          setVoiceChannels((prevChannels) => [...prevChannels, createdChannel]);
-        } else {
-          throw new Error('Failed to create new voice channel');
-        }
-      } catch (error) {
-        console.error('Error adding new voice channel:', error);
+      const createdChannel = await addNewVoiceChannel(newChannel);
+      if (createdChannel) {
+        setVoiceChannels((prevChannels) => [...prevChannels, createdChannel]);
+        setSearchQuery(''); // Clear the search query
+        setShowSearch(false); // Hide the search bar
       }
     }
   };
@@ -133,23 +128,41 @@ function MessagePage() {
     <div className="message-page">
       <div className="members-list">
         <div className="section">
-          <TitleWithButton title="Text Messages" onClick={addNewMember} />
+          <TitleWithButton 
+            title="Text Messages" 
+            onClick={() => { setShowSearch(!showSearch); handleAddNewMember(); }} 
+            showSearch={showSearch} 
+            setShowSearch={setShowSearch} // Pass setShowSearch for handling visibility
+            onSearchChange={(e) => setSearchQuery(e.target.value)} 
+            searchQuery={searchQuery} 
+          />
           <div className="member-list-content">
-            {members.map((member) => (
-              <MemberItem
-                key={member.id} // Ensure you're using the correct property for ID
-                member={member}
-                onClick={handleMemberClick}
-              />
-            ))}
+            {friends.length > 0 ? (
+              friends.map((friend) => (
+                <MemberItem
+                  key={friend.friendId} // Assuming friendId is unique
+                  member={{ id: friend.friendId, name: friend.name, avatar: friend.avatar }} // Ensure the member object matches the structure
+                  onClick={handleMemberClick}
+                />
+              ))
+            ) : (
+              <div className="no-friends-message">Sounds quiet. Add Friends!</div> // Message when no friends
+            )}
           </div>
         </div>
         <div className="section">
-          <TitleWithButton title="Voice Channels" onClick={addNewVoiceChannel} />
+          <TitleWithButton 
+            title="Voice Channels" 
+            onClick={() => { setShowSearch(!showSearch); handleAddNewVoiceChannel(); }} 
+            showSearch={showSearch} 
+            setShowSearch={setShowSearch} // Pass setShowSearch for handling visibility
+            onSearchChange={(e) => setSearchQuery(e.target.value)} 
+            searchQuery={searchQuery} 
+          />
           <div className="member-list-content">
             {voiceChannels.map((channel) => (
               <MemberItem
-                key={channel.id} // Ensure you're using the correct property for ID
+                key={channel.id}
                 member={channel}
                 onClick={handleMemberClick}
               />
@@ -159,7 +172,7 @@ function MessagePage() {
       </div>
       <div className="chat-area">
         {selectedMember ? (
-          <ChatArea selectedMember={selectedMember} />
+          <ChatArea selectedMember={selectedMember} userProfile={userProfile} />
         ) : (
           <div>Select a member to start chatting</div>
         )}

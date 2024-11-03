@@ -4,6 +4,7 @@ const API_URL_AUTH = 'http://localhost:3000/api/auth'; // Adjust this to your ba
 const API_URL_USER = 'http://localhost:3000/api/user'; // Define the user API URL
 const API_URL_MESSAGE = 'http://localhost:3000/api/message'; // Define the message API URL
 const API_URL_MEMBER = 'http://localhost:3000/api/members'; // Define the member API URL
+const API_URL_FRIENDS = 'http://localhost:3000/api/friends'; // Define the friends API URL
 const API_URL_VOICE_CHANNEL = 'http://localhost:3000/api/voiceChannels'; // Define the voice channel API URL
 
 export const loginUser = async (userData) => {
@@ -94,17 +95,36 @@ export const fetchVoiceChannels = async () => {
     }
 };
 
-// Function to fetch friends
-export const fetchFriends = async () => {
-    const token = localStorage.getItem('token'); // Get the token from local storage
+// Function to add a new voice channel
+export const addNewVoiceChannel = async (channelData) => {
+    const token = localStorage.getItem('token');
     if (!token) {
         throw new Error('No token found');
     }
 
     try {
-        const response = await axios.get(`${API_URL_USER}/members`, {
+        const response = await axios.post(API_URL_VOICE_CHANNEL, channelData, {
             headers: { Authorization: `Bearer ${token}` }
         });
+        return response.data; // Return the created voice channel
+    } catch (error) {
+        console.error('Error adding new voice channel:', error);
+        throw error;
+    }
+};
+
+// Function to fetch friends
+export const fetchFriends = async () => {
+    const apitoken = localStorage.getItem('token'); // Get the token from local storage
+    if (!apitoken) {
+        throw new Error('No token found');
+    }
+
+    try {
+        const response = await axios.get('http://localhost:3000/api/friends', {
+            headers: { Authorization: `Bearer ${apitoken}` }
+        });
+        console.log("Response data fetch friends: " + response.data);
         return response.data; // Return the list of friends
     } catch (error) {
         console.error('Error fetching friends:', error);

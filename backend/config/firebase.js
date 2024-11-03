@@ -1,5 +1,7 @@
 import { initializeApp } from 'firebase/app';
 import { getDatabase, ref, set, onValue } from 'firebase/database';
+import { getFirestore } from "firebase/firestore";
+import { getAuth } from "firebase/auth";
 
 const firebaseConfig = {
     apiKey: "AIzaSyCns0jxTP_KXLiMHHZ7iDDEvENsGBrOyXE",
@@ -13,8 +15,8 @@ const firebaseConfig = {
   
   // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
-const database = getDatabase(app);
+export const db = getFirestore(app);
+export const auth = getAuth(app);
 
 export const sendMessage = (senderId, receiverId, content) => {
   const messageId = Date.now().toString(); // Unique ID for the message

@@ -7,7 +7,7 @@ import sequelize from '../config/database.js'; // For transaction support
 
 // Encryption Setup
 const algorithm = 'aes-256-cbc'; // Encryption algorithm
-const secretKey = process.env.ENCRYPTION_KEY || 'your-secure-secret-key';
+const secretKey = process.env.ENCRYPTION_KEY || 'mySuperSecretKey123!@';
 
 if (secretKey === 'your-secure-secret-key') {
     console.error('Warning: Using an insecure default encryption key. Set ENCRYPTION_KEY in the environment variables.');
