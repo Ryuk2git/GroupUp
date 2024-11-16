@@ -15,7 +15,7 @@ function MainPage() {
     useEffect(() => {
         const fetchUserProfile = async () => {
             setLoading(true); // Start loading
-            const token = localStorage.getItem('token'); 
+            const token = localStorage.getItem('x-auth-token'); 
             if (!token) {
                 console.error('No token found. User is not authenticated.');
                 setLoading(false);

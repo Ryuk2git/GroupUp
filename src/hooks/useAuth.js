@@ -10,7 +10,7 @@ export const useAuth = () => {
         try {
             const { token, user } = await loginUser({ email, password });
             if (token) {
-                localStorage.setItem('token', token);
+                localStorage.setItem('x-auth-token', token);
                 navigate('/main');
             } else {
                 throw new Error('Incorrect username or password');
@@ -24,7 +24,7 @@ export const useAuth = () => {
         try {
             const { token, user } = await registerUser({ name, email, password });
             if (token) {
-                localStorage.setItem('token', token);
+                localStorage.setItem('x-auth-token', token);
                 navigate('/main');
             } else {
                 throw new Error('Failed to sign up. Please try again.');

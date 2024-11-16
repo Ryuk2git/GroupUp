@@ -10,7 +10,7 @@ const API_URL_VOICE_CHANNEL = 'http://localhost:3000/api/voiceChannels'; // Defi
 export const loginUser = async (userData) => {
     const response = await axios.post(`${API_URL_AUTH}/login`, userData);
     if (response.data && response.data.token) {
-        localStorage.setItem('token', response.data.token); // Ensure you're storing the token
+        localStorage.setItem('x-auth-token', response.data.token); // Ensure you're storing the token
     }
     return response.data; // Ensure it returns the token
 };
@@ -21,7 +21,7 @@ export const registerUser = async (userData) => {
 };
 
 export const fetchUserData = async () => {
-    const token = localStorage.getItem('token'); // Get the token from local storage
+    const token = localStorage.getItem('x-auth-token'); // Get the token from local storage
     if (!token) {
         throw new Error('No token found');
     }
@@ -43,7 +43,7 @@ export const fetchUserData = async () => {
 
 // Function to fetch members
 export const fetchMembers = async () => {
-    const token = localStorage.getItem('token'); // Get the token from local storage
+    const token = localStorage.getItem('x-auth-token'); // Get the token from local storage
     if (!token) {
         throw new Error('No token found');
     }
@@ -97,7 +97,7 @@ export const fetchVoiceChannels = async () => {
 
 // Function to add a new voice channel
 export const addNewVoiceChannel = async (channelData) => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('x-auth-token');
     if (!token) {
         throw new Error('No token found');
     }
@@ -115,18 +115,19 @@ export const addNewVoiceChannel = async (channelData) => {
 
 // Function to fetch friends
 export const fetchFriends = async () => {
-    const token = localStorage.getItem('token'); // Get the token from local storage
+    const token = localStorage.getItem('x-auth-token'); // Get the token from local storage
     const userID = localStorage.getItem('userID');
-    
+    console.log("API TOKEN: ", token);
+
     if (!token) {
         throw new Error('No token found');
     }
     console.log("I have the token,");
     try {
-        const response = await axios.get(API_URL_FRIENDS, {
-            headers: { 
-                'x-auth-token': token
-            }
+        const response = await axios.post(`http://localhost:3000/api/friends/${userID}}`, {
+                headers: { 
+                    'x-auth-token': token
+                }
         });
         return response.data; // Return the list of friends
     } catch (error) {
@@ -137,7 +138,7 @@ export const fetchFriends = async () => {
 
 // Function to fetch groups
 export const fetchGroups = async () => {
-    const token = localStorage.getItem('token'); // Get the token from local storage
+    const token = localStorage.getItem('x-auth-token'); // Get the token from local storage
     if (!token) {
         throw new Error('No token found');
     }
@@ -155,7 +156,7 @@ export const fetchGroups = async () => {
 
 // Function to fetch messages
 export const fetchMessages = async (id) => {
-    const token = localStorage.getItem('token'); // Get the token from local storage
+    const token = localStorage.getItem('x-auth-token'); // Get the token from local storage
     if (!token) {
         throw new Error('No token found');
     }
@@ -184,7 +185,7 @@ export const fetchMessages = async (id) => {
 
 // Function to send a message
 export const sendMessage = async (senderId, receiverId, content) => {
-    const token = localStorage.getItem('token'); // Get the token from local storage
+    const token = localStorage.getItem('x-auth-token'); // Get the token from local storage
     if (!token) {
         throw new Error('No token found');
     }

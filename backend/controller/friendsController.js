@@ -25,69 +25,72 @@ import Friend from '../models/Friends.js';  // Specify the exact file
 //     }
 // };
 
+// export const fetchFriends = async (req, res) => {    
+//     try{
+//         const friends = await getFriends();
+//         res.json(friends);
+//     }catch(error){
+//         console.error('Error fetching friends:', error);
+//         res.status(500).json({ error: 'Internal Server Error' });
+//     }
+// };
+
 export const fetchFriends = async (req, res) => {
-    try{
-        const friends = await getFriends();
-        res.json(friends);
-    }catch(error){
-        console.error('Error fetching friends:', error);
-        res.status(500).json({ error: 'Internal Server Error' });
+    const userID = req.params.userID; // Get userID from the request body params
+    console.log("User ID from params: ", userID);
+
+    const bodyToken = req.body['x-auth-token'];
+    console.log("Body token: ", bodyToken);
+
+    const token = req.headers['x-auth-token']; // Get the token from headers
+    console.log("Token received: ", token);
+
+    // Validate the token
+    if (!token) {
+        console.log("Token is missing.");
+        return res.status(401).json({ error: 'Token is missing.' });
+    }
+
+    try {
+        // Find the user by the userID
+        const user = await User.findByPk(userID);
+
+        if (!user) {
+            return res.status(404).json({ message: 'User not found.' });
+        }
+
+        // Fetch friends associated with the userID
+        const friends = await Friend.findAll({
+            where: {
+                userId: userID, // Use the userID from the request
+            },
+            include: [
+                {
+                    model: User, // Include the User model to get friend's details
+                    as: 'friend', // Alias to avoid naming conflict
+                    attributes: ['userID', 'username'], // Select specific fields
+                }
+            ]
+        });
+
+        if (friends.length === 0) {
+            return res.status(404).json({ message: 'No friends found.' });
+        }
+
+        // Format the result to return friendId and username
+        const formattedFriends = friends.map(friend => ({
+            friendId: friend.friendId, // Friend ID from Friend model
+            username: friend.friend.username, // Friend's username from User model
+        }));
+
+        return res.status(200).json({ friends: formattedFriends });
+
+    } catch (error) {
+        console.error("Error fetching friends: ", error);
+        return res.status(500).json({ error: 'Error fetching friends.' });
     }
 };
 
-// export const fetchFriends = async (req, res) => {
-//     const { userID } = req.query;  // Get the userId from route parameters
-//     console.log("User ID: ", userID);
-
-//     const token = req.headers['x-auth-token'];  // Get the token from headers
-//     const headUserID = req.headers['userID'];
-//     console.log(headUserID);
-
-//     // Token validation logic (if you are using JWT)
-//     if (!token) {
-//         console.log("I did bnot recieve the token");
-//         return res.status(401).json({ error: 'Token is missing.' });
-//     }
-
-//     try {
-//         // Find the user by the userId
-//         const user = await User.findByPk(userID);
-
-//         if (!user) {
-//             return res.status(404).json({ message: 'User not found.' });
-//         }
-
-//         // Fetch the friends by userId using the Friend model
-//         const friends = await Friend.findAll({
-//             where: {
-//                 userId: headUserID,  // Find friends of the current user
-//             },
-//             include: [
-//                 {
-//                     model: User,  // Include the User model to get the friend's details
-//                     as: 'friend',  // Alias to avoid naming conflict (User table alias)
-//                     attributes: ['userID', 'username']  // Only get friendId and username
-//                 }
-//             ]
-//         });
-
-//         if (friends.length === 0) {
-//             return res.status(404).json({ message: 'No friends found.' });
-//         }
-
-//         // Format the result to return the friendId and username
-//         const formattedFriends = friends.map(friend => ({
-//             friendId: friend.friendId,  // Friend ID from Friend model
-//             username: friend.friend.username,  // Friend's username from User model
-//         }));
-
-//         return res.status(200).json({ friends: formattedFriends });
-
-//     } catch (error) {
-//         console.error(error);
-//         return res.status(500).json({ error: 'Error fetching friends.' });
-//     }
-// };
 
 
 // export const fetchFriends = async (req, res) => {

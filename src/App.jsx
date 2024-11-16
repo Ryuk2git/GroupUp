@@ -14,7 +14,7 @@ const App = () => {
         const fetchUserProfile = async () => {
             try {
                 // Replace with your token fetching mechanism
-                const token = localStorage.getItem('token'); // Assuming token is stored in local storage
+                const token = localStorage.getItem('x-auth-token'); // Assuming token is stored in local storage
                 const response = await axios.get('http://localhost:3000/api/user', {
                     headers: {
                         'x-auth-token': token,
@@ -31,7 +31,6 @@ const App = () => {
     }, []); // Run once on component mount
 
     return (
-        <AuthProvider>
             <Router>
                 <Routes>
                     <Route path="/" element={<LoginPage />} />
@@ -39,7 +38,6 @@ const App = () => {
                     {/* <Route path="/main/projects" element={<ProjectPage />} /> Updated Project Page route */ }
                 </Routes>
             </Router>
-        </AuthProvider>
     );
 };
 

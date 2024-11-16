@@ -67,7 +67,7 @@ const LoginPage = () => {
                     password: signInPassword,
                 });
                 const { token, userId } = response.data; // Destructure response data
-                localStorage.setItem('token', token);
+                localStorage.setItem('x-auth-token', token);
                 localStorage.setItem('userId', userId);
                 navigate('/main'); // Navigate to the main page
             } else {
@@ -78,7 +78,7 @@ const LoginPage = () => {
                     password: signUpPassword,
                 });
                 const { token, userId } = response.data; // Destructure response data
-                localStorage.setItem('token', token);
+                localStorage.setItem('x-auth-token', token);
                 localStorage.setItem('userId', userId);
                 navigate('/main'); // Navigate to the main page
             }

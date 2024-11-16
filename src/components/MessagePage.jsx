@@ -44,7 +44,7 @@ function MessagePage({ userProfile }) {
 
   useEffect(() => {
     const loadMembers = async () => {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('x-auth-token');
       if (!localToken) {
         console.error("No auth token found");
         return;
@@ -59,7 +59,7 @@ function MessagePage({ userProfile }) {
     // };
 
     const loadFriends = async () => {
-      const token = localStorage.getItem('token'); // Retrieve the token
+      const token = localStorage.getItem('x-auth-token'); // Retrieve the token
       const userID = localStorage.getItem('userID');
       if (!token) {
           console.error("No auth token found");

@@ -5,6 +5,7 @@ import authService from '../services/authService.js';
 const router = express.Router();
 
 // Define the route to fetch friends
-router.get('/', fetchFriends);
+router.post('/:userID', fetchFriends);
 
+this is a rhern sdkajshbdjashgd-
 export default router;
