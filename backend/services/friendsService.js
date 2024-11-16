@@ -1,4 +1,4 @@
-import authService from '../services/authService.js'; // Adjust the import based on your file structure
+// import authService from '../services/authService.js'; // Adjust the import based on your file structure
 import db from '../config/database.js'; // Adjust based on your database setup
 
 // export const getFriends = async (token) => {
@@ -27,3 +27,39 @@ export const getFriends = async () => {
         throw error;
     }
 };
+
+// services/friendsService.js
+// import db from '../config/database.js';  // Assuming you have a db config file
+// import jwt from 'jsonwebtoken';    // Assuming you're using JWT for token verification
+
+// // Function to verify the JWT token (if needed)
+// const verifyToken = (token) => {
+//     const privateKey = "mySuperSecretKey123!@";
+
+//     try {
+//         const decoded = jwt.verify(token, privateKey);  // Decode the token using secret
+//         return decoded;
+//     } catch (error) {
+//         throw new Error('Invalid or expired token');
+//     }
+// };
+
+// // Function to get friends from the database
+// export const getFriends = async (userID, token) => {
+//     // Verify the token before making any database calls
+//     verifyToken(token);
+//     console.log("Token decoded");
+
+//     // SQL query to get friends and their details
+//     const query = `
+//         SELECT f.friendId, f.status, u.username
+//         FROM friends f
+//         JOIN users u ON u.userId = f.friendId
+//         WHERE f.userId = ?;
+//     `;
+    
+//     // Execute the query with userId as parameter
+//     const [results] = await db.query(query, [userID]);
+
+//     return results;  // Return the list of friends
+// };

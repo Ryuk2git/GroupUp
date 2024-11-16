@@ -103,7 +103,7 @@ export const registerUser = async (req, res) => {
         // Sign the JWT token
         const token = jwt.sign(payload, privateKey, { expiresIn: '1d' });
 
-        res.status(201).json({ token });
+        res.json({ token, userID: user.userID});
     } catch (error) {
         console.error(error.message);
         res.status(500).send('Server error');
@@ -144,7 +144,7 @@ export const loginUser = async (req, res) => {
         // Sign the JWT token
         const token = jwt.sign(payload, privateKey, { expiresIn: '1h' });
 
-        res.json({ token });
+        res.json({ token, userID: user.userID});
     } catch (error) {
         console.error(error.message);
         res.status(500).send('Server error');

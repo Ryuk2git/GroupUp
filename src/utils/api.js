@@ -50,7 +50,7 @@ export const fetchMembers = async () => {
 
     try {
         const response = await axios.get(API_URL_MEMBER, {
-            headers: { Authorization: `Bearer ${token}` }
+            headers: { 'x-auth-token': token }
         });
         return response.data; // Return the list of members
     } catch (error) {
@@ -68,7 +68,7 @@ export const addNewMember = async (memberData) => {
 
     try {
         const response = await axios.post(API_URL_MEMBER, memberData, {
-            headers: { Authorization: `Bearer ${token}` }
+            headers: { 'x-auth-token': token }
         });
         return response.data; // Return the created member
     } catch (error) {
@@ -86,7 +86,7 @@ export const fetchVoiceChannels = async () => {
 
     try {
         const response = await axios.get(API_URL_VOICE_CHANNEL, {
-            headers: { Authorization: `Bearer ${token}` }
+            headers: { 'x-auth-token': token }
         });
         return response.data; // Return the list of voice channels
     } catch (error) {
@@ -104,7 +104,7 @@ export const addNewVoiceChannel = async (channelData) => {
 
     try {
         const response = await axios.post(API_URL_VOICE_CHANNEL, channelData, {
-            headers: { Authorization: `Bearer ${token}` }
+            headers: { 'x-auth-token': token }
         });
         return response.data; // Return the created voice channel
     } catch (error) {
@@ -115,16 +115,19 @@ export const addNewVoiceChannel = async (channelData) => {
 
 // Function to fetch friends
 export const fetchFriends = async () => {
-    const apitoken = localStorage.getItem('token'); // Get the token from local storage
-    if (!apitoken) {
+    const token = localStorage.getItem('token'); // Get the token from local storage
+    const userID = localStorage.getItem('userID');
+    
+    if (!token) {
         throw new Error('No token found');
     }
-
+    console.log("I have the token,");
     try {
-        const response = await axios.get('http://localhost:3000/api/friends', {
-            headers: { Authorization: `Bearer ${apitoken}` }
+        const response = await axios.get(API_URL_FRIENDS, {
+            headers: { 
+                'x-auth-token': token
+            }
         });
-        console.log("Response data fetch friends: " + response.data);
         return response.data; // Return the list of friends
     } catch (error) {
         console.error('Error fetching friends:', error);
@@ -141,7 +144,7 @@ export const fetchGroups = async () => {
 
     try {
         const response = await axios.get(`${API_URL_USER}/groups`, {
-            headers: { Authorization: `Bearer ${token}` }
+            headers: { 'x-auth-token': token }
         });
         return response.data; // Return the list of groups
     } catch (error) {
@@ -159,7 +162,7 @@ export const fetchMessages = async (id) => {
 
     try {
         const response = await axios.get(`${API_URL_MESSAGE}/${id}/messages`, {
-            headers: { Authorization: `Bearer ${token}` }
+            headers: { 'x-auth-token': token }
         });
 
         // Check if response data exists and is in expected format
@@ -194,7 +197,7 @@ export const sendMessage = async (senderId, receiverId, content) => {
 
     try {
         const response = await axios.post(API_URL_MESSAGE, messageData, {
-            headers: { Authorization: `Bearer ${token}` }
+            headers: { 'x-auth-token': token }
         });
         return response.data; // Return the sent message
     } catch (error) {

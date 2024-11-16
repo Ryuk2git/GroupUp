@@ -33,7 +33,7 @@ function ChatArea({ selectedMember, currentUserId }) {
     try {
       const response = await fetch(`/api/messages/${selectedMember.id}`, {
         headers: {
-          'Authorization': `Bearer ${token}`,
+          'x-auth-token': token,
           'Content-Type': 'application/json',
         },
       });
@@ -58,7 +58,7 @@ function ChatArea({ selectedMember, currentUserId }) {
           method: 'POST',
           headers: { 
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('authToken')}`, // Include token in header
+            'x-auth-token': localStorage.getItem('authToken'), // Include token in header
           },
           body: JSON.stringify(newMessage),
         });

@@ -60,14 +60,14 @@ function MessagePage({ userProfile }) {
 
     const loadFriends = async () => {
       const token = localStorage.getItem('token'); // Retrieve the token
-      console.log("Friends token: " + token);
+      const userID = localStorage.getItem('userID');
       if (!token) {
           console.error("No auth token found");
           return;
       }
       try {
-          const friendsData = await fetchFriends(localToken); // Pass token to fetchFriends
-          setFriends(friendsData);
+          const friendsData = await fetchFriends(token); // Pass token to fetchFriends
+          setFriends(friendsData.friends);
       } catch (error) {
           console.error("Failed to load friends:", error);
       }
@@ -76,7 +76,6 @@ function MessagePage({ userProfile }) {
     loadMembers();
     // loadVoiceChannels();
     loadFriends();
-    console.log("token in the MessagePage Function: " + localToken );
   }, [localToken]);
 
   useEffect(() => {

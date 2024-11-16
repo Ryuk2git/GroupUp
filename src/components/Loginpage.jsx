@@ -66,7 +66,9 @@ const LoginPage = () => {
                     emailID: signInEmail,
                     password: signInPassword,
                 });
-                localStorage.setItem('token', response.data.token); // Save the token
+                const { token, userId } = response.data; // Destructure response data
+                localStorage.setItem('token', token);
+                localStorage.setItem('userId', userId);
                 navigate('/main'); // Navigate to the main page
             } else {
                 const response = await axios.post(`${API_URL}/register`, {
@@ -75,7 +77,9 @@ const LoginPage = () => {
                     email: signUpEmail,
                     password: signUpPassword,
                 });
-                localStorage.setItem('token', response.data.token); // Save the token
+                const { token, userId } = response.data; // Destructure response data
+                localStorage.setItem('token', token);
+                localStorage.setItem('userId', userId);
                 navigate('/main'); // Navigate to the main page
             }
         } catch (err) {
