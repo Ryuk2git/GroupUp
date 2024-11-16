@@ -7,5 +7,4 @@ const router = express.Router();
 // Define the route to fetch friends
 router.post('/:userID', fetchFriends);
 
-this is a rhern sdkajshbdjashgd-
 export default router;

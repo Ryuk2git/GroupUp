@@ -21,6 +21,7 @@
     "express-validator": "^7.2.0",
     "firebase": "^10.14.1",
     "font-awesome": "^4.7.0",
+    "fs-extra": "^11.2.0",
     "jsonwebtoken": "^9.0.2",
     "monaco-editor": "^0.52.0",
     "mongoose": "^8.6.0",
