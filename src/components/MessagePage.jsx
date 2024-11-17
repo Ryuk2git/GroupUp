@@ -3,11 +3,18 @@ import ChatArea from './ChatArea';
 import { fetchMembers, fetchVoiceChannels, addNewMember, addNewVoiceChannel, fetchFriends } from '../utils/api.js'; // Updated imports
 import '../styles/MainPage.css';
 
+// Function to handle searched members with the required attributes
+function searchedMembers(members, searchQuery) {
+  return members.filter((member) =>
+    member?.name?.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+}
+
 function MemberItem({ member, onClick }) {
   return (
     <div className="member-item" onClick={() => onClick(member)}>
       <img src={member.avatar} alt={member.name} className="member-avatar" />
-      <span>{member.name}</span>
+      <span>{member.name}</span> {/* This will display the friend's name */}
     </div>
   );
 }
@@ -16,17 +23,17 @@ function TitleWithButton({ title, onClick, showSearch, setShowSearch, onSearchCh
   return (
     <div className="title-container">
       <div className="title">{title}</div>
-      <div className="add-button" onClick={onClick}>
+      <div className="add-button" onClick={() => { onClick(); setShowSearch(!showSearch); }}>
         <div className="add-icon">+</div>
       </div>
       <input
         type="text"
-        className={`search-bar ${showSearch ? 'visible' : ''}`} // Use conditional class
+        className={`search-bar ${showSearch ? 'visible' : ''}`} // Toggle the visibility class
         value={searchQuery}
         onChange={onSearchChange}
         placeholder="Search for members..."
-        onFocus={() => setShowSearch(true)} // Show on focus
-        onBlur={() => setShowSearch(false)} // Hide on blur
+        onFocus={() => setShowSearch(true)} // Keep the search bar visible on focus
+        onBlur={() => setShowSearch(false)} // Hide on blur if not searching
       />
     </div>
   );
@@ -42,6 +49,7 @@ function MessagePage({ userProfile }) {
   const [showSearch, setShowSearch] = useState(false);
   const localToken = localStorage.getItem('token');
 
+  // Load members and friends data
   useEffect(() => {
     const loadMembers = async () => {
       const token = localStorage.getItem('x-auth-token');
@@ -51,37 +59,32 @@ function MessagePage({ userProfile }) {
       }
       const membersData = await fetchMembers();
       setMembers(membersData);
+      console.log(membersData);
     };
 
-    // const loadVoiceChannels = async () => {
-    //   const channelsData = await fetchVoiceChannels();
-    //   setVoiceChannels(channelsData);
-    // };
-
     const loadFriends = async () => {
-      const token = localStorage.getItem('x-auth-token'); // Retrieve the token
+      const token = localStorage.getItem('x-auth-token');
       const userID = localStorage.getItem('userID');
       if (!token) {
-          console.error("No auth token found");
-          return;
+        console.error("No auth token found");
+        return;
       }
       try {
-          const friendsData = await fetchFriends(token); // Pass token to fetchFriends
-          setFriends(friendsData.friends);
+        const friendsData = await fetchFriends(token);
+        console.log("Fetched friends:", friendsData); 
+        setFriends(friendsData.friends);
       } catch (error) {
-          console.error("Failed to load friends:", error);
+        console.error("Failed to load friends:", error);
       }
-  };
+    };
 
     loadMembers();
-    // loadVoiceChannels();
     loadFriends();
   }, [localToken]);
 
+  // Filter members based on search query
   useEffect(() => {
-    const filtered = members.filter((member) =>
-      member?.name?.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    const filtered = searchedMembers(members, searchQuery); // Use the searchedMembers function
     setFilteredMembers(filtered);
   }, [searchQuery, members]);
 
@@ -127,20 +130,24 @@ function MessagePage({ userProfile }) {
     <div className="message-page">
       <div className="members-list">
         <div className="section">
-          <TitleWithButton 
-            title="Text Messages" 
-            onClick={() => { setShowSearch(!showSearch); handleAddNewMember(); }} 
-            showSearch={showSearch} 
+          <TitleWithButton
+            title="Text Messages"
+            onClick={() => { setShowSearch(!showSearch); handleAddNewMember(); }}
+            showSearch={showSearch}
             setShowSearch={setShowSearch} // Pass setShowSearch for handling visibility
-            onSearchChange={(e) => setSearchQuery(e.target.value)} 
-            searchQuery={searchQuery} 
+            onSearchChange={(e) => setSearchQuery(e.target.value)}
+            searchQuery={searchQuery}
           />
           <div className="member-list-content">
             {friends.length > 0 ? (
               friends.map((friend) => (
                 <MemberItem
                   key={friend.friendId} // Assuming friendId is unique
-                  member={{ id: friend.friendId, name: friend.name, avatar: friend.avatar }} // Ensure the member object matches the structure
+                  member={{
+                    id: friend.friendId,
+                    name: friend.username, // Ensure that 'username' is the correct property from your backend
+                    avatar: friend.avatar || 'https://via.placeholder.com/40' // Add avatar if available
+                  }} // Ensure the member object matches the structure
                   onClick={handleMemberClick}
                 />
               ))
@@ -150,13 +157,13 @@ function MessagePage({ userProfile }) {
           </div>
         </div>
         <div className="section">
-          <TitleWithButton 
-            title="Voice Channels" 
-            onClick={() => { setShowSearch(!showSearch); handleAddNewVoiceChannel(); }} 
-            showSearch={showSearch} 
+          <TitleWithButton
+            title="Voice Channels"
+            onClick={() => { setShowSearch(!showSearch); handleAddNewVoiceChannel(); }}
+            showSearch={showSearch}
             setShowSearch={setShowSearch} // Pass setShowSearch for handling visibility
-            onSearchChange={(e) => setSearchQuery(e.target.value)} 
-            searchQuery={searchQuery} 
+            onSearchChange={(e) => setSearchQuery(e.target.value)}
+            searchQuery={searchQuery}
           />
           <div className="member-list-content">
             {voiceChannels.map((channel) => (

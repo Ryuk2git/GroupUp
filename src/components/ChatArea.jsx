@@ -5,7 +5,7 @@ import { collection, query, orderBy, onSnapshot, addDoc } from "firebase/firesto
 import { db } from "../../backend/config/firebase.js"; // Update with the correct path
 import '../styles/ChatArea.css';
 
-const SOCKET_SERVER_URL = 'http://localhost:5000';
+const SOCKET_SERVER_URL = 'http://localhost:3000';
 
 function ChatArea({ selectedMember, currentUserId }) {
   const [messages, setMessages] = useState([]);
@@ -58,7 +58,7 @@ function ChatArea({ selectedMember, currentUserId }) {
           method: 'POST',
           headers: { 
             'Content-Type': 'application/json',
-            'x-auth-token': localStorage.getItem('authToken'), // Include token in header
+            'x-auth-token': localStorage.getItem('x-auth-token'), // Include token in header
           },
           body: JSON.stringify(newMessage),
         });

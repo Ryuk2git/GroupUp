@@ -28,4 +28,7 @@ const Conversations = sequelize.define('Conversations', {
     tableName: 'conversations',
 });
 
+Conversations.hasMany(Message, { foreignKey: 'conversationId' });
+Message.belongsTo(Conversations, { foreignKey: 'conversationId' });
+
 export default Conversations;

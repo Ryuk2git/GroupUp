@@ -1,4 +1,4 @@
-import Message from '../models/Message.js';
+    import Message from '../models/Message.js';
 import Friend from '../models/Friends.js';
 import crypto from 'crypto';
 import { Op } from 'sequelize';

@@ -124,11 +124,14 @@ export const fetchFriends = async () => {
     }
     console.log("I have the token,");
     try {
-        const response = await axios.post(`http://localhost:3000/api/friends/${userID}}`, {
+        const response = await axios.post(`http://localhost:3000/api/friends/${userID}`, 
+            {},
+            {
                 headers: { 
                     'x-auth-token': token
                 }
-        });
+            }
+    );
         return response.data; // Return the list of friends
     } catch (error) {
         console.error('Error fetching friends:', error);

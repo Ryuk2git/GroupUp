@@ -1,6 +1,7 @@
 import { getFriends } from '../services/friendsService.js'; // Adjust the import based on your file structure
 import User from '../models/User.js';  // Specify the exact file
 import Friend from '../models/Friends.js';  // Specify the exact file
+import sequelize from '../config/database.js';
 
 // export const fetchFriends = async (req, res) => {
 //     const token = req.headers.authorization?.split(' ')[1]; // Get the token from the request headers
@@ -39,9 +40,6 @@ export const fetchFriends = async (req, res) => {
     const userID = req.params.userID; // Get userID from the request body params
     console.log("User ID from params: ", userID);
 
-    const bodyToken = req.body['x-auth-token'];
-    console.log("Body token: ", bodyToken);
-
     const token = req.headers['x-auth-token']; // Get the token from headers
     console.log("Token received: ", token);
 
@@ -52,38 +50,26 @@ export const fetchFriends = async (req, res) => {
     }
 
     try {
-        // Find the user by the userID
-        const user = await User.findByPk(userID);
+        // Use raw SQL query to fetch friends
+        const rawQuery = `
+            SELECT f.friendId, f.status, u.username
+            FROM friends f
+            JOIN users u 
+            ON u.userID = f.friendId
+            WHERE f.userId = :userID;
+        `;
 
-        if (!user) {
-            return res.status(404).json({ message: 'User not found.' });
-        }
-
-        // Fetch friends associated with the userID
-        const friends = await Friend.findAll({
-            where: {
-                userId: userID, // Use the userID from the request
-            },
-            include: [
-                {
-                    model: User, // Include the User model to get friend's details
-                    as: 'friend', // Alias to avoid naming conflict
-                    attributes: ['userID', 'username'], // Select specific fields
-                }
-            ]
+        // Execute the query with parameterized userID
+        const friends = await sequelize.query(rawQuery, {
+            replacements: { userID }, // Parameterized query for security
+            type: sequelize.QueryTypes.SELECT, // Specify SELECT query
         });
 
         if (friends.length === 0) {
             return res.status(404).json({ message: 'No friends found.' });
         }
 
-        // Format the result to return friendId and username
-        const formattedFriends = friends.map(friend => ({
-            friendId: friend.friendId, // Friend ID from Friend model
-            username: friend.friend.username, // Friend's username from User model
-        }));
-
-        return res.status(200).json({ friends: formattedFriends });
+        return res.status(200).json({ friends });
 
     } catch (error) {
         console.error("Error fetching friends: ", error);

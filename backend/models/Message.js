@@ -11,7 +11,7 @@ const Message = sequelize.define('Message', {
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
-            model: 'Users', // Ensure this matches your User model's table name
+            model: 'users', // Ensure this matches your User model's table name
             key: 'id',
         },
     },
@@ -19,7 +19,7 @@ const Message = sequelize.define('Message', {
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
-            model: 'Users',
+            model: 'users',
             key: 'id',
         },
     },

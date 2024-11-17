@@ -142,7 +142,7 @@ export const loginUser = async (req, res) => {
         };
 
         // Sign the JWT token
-        const token = jwt.sign(payload, privateKey, { expiresIn: '1h' });
+        const token = jwt.sign(payload, privateKey, { expiresIn: '4h' });
 
         res.json({ token, userID: user.userID});
     } catch (error) {
