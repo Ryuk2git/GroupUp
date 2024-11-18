@@ -2,7 +2,7 @@ import axios from 'axios';
 
 const API_URL_AUTH = 'http://localhost:3000/api/auth'; // Adjust this to your backend URL
 const API_URL_USER = 'http://localhost:3000/api/user'; // Define the user API URL
-const API_URL_MESSAGE = 'http://localhost:3000/api/message'; // Define the message API URL
+const API_URL_MESSAGE = 'http://localhost:3000/api/messages'; // Define the message API URL
 const API_URL_MEMBER = 'http://localhost:3000/api/members'; // Define the member API URL
 const API_URL_FRIENDS = 'http://localhost:3000/api/friends'; // Define the friends API URL
 const API_URL_VOICE_CHANNEL = 'http://localhost:3000/api/voiceChannels'; // Define the voice channel API URL
@@ -117,12 +117,10 @@ export const addNewVoiceChannel = async (channelData) => {
 export const fetchFriends = async () => {
     const token = localStorage.getItem('x-auth-token'); // Get the token from local storage
     const userID = localStorage.getItem('userID');
-    console.log("API TOKEN: ", token);
 
     if (!token) {
         throw new Error('No token found');
     }
-    console.log("I have the token,");
     try {
         const response = await axios.post(`http://localhost:3000/api/friends/${userID}`, 
             {},
@@ -158,25 +156,33 @@ export const fetchGroups = async () => {
 };
 
 // Function to fetch messages
-export const fetchMessages = async (id) => {
+export const fetchMessages = async (currentUserId, selectedFriendId) => {
     const token = localStorage.getItem('x-auth-token'); // Get the token from local storage
     if (!token) {
         throw new Error('No token found');
     }
 
     try {
-        const response = await axios.get(`${API_URL_MESSAGE}/${id}/messages`, {
+        const response = await axios.post(`${API_URL_MESSAGE}/${currentUserId}/${selectedFriendId}`, {}, {
             headers: { 'x-auth-token': token }
         });
 
-        // Check if response data exists and is in expected format
+        // Log response for debugging
+        console.log('Fetched messages:', response.data);
+
+        // Check if response contains a message indicating no messages found
+        if (response.data.message === 'No messages found. Start a conversation!') {
+            return { message: response.data.message }; // Return special message for UI
+        }
+
+        // Handle the case where messages are returned successfully
         if (!response.data || !Array.isArray(response.data)) {
             throw new Error('Invalid data format received from server');
         }
 
         return response.data; // Return the list of messages
     } catch (error) {
-        // Check for specific error response structure from backend (e.g., 401 Unauthorized)
+        // Handle error and display appropriate message
         if (error.response) {
             console.error(`Error ${error.response.status}: ${error.response.data.message}`);
         } else {
@@ -196,16 +202,24 @@ export const sendMessage = async (senderId, receiverId, content) => {
     const messageData = {
         senderId,
         receiverId,
-        content
+        content,
+        timestamp: new Date().toISOString(),  // Add timestamp in ISO format
     };
 
+    console.log(`Sending message for userid ${senderId} to the firend ${receiverId}`);
+    console.log("Message to be sent: ", content);
     try {
-        const response = await axios.post(API_URL_MESSAGE, messageData, {
+        // Send the message to the server
+        const response = await axios.post(`${API_URL_MESSAGE}/send/${senderId}/${receiverId}`, 
+            { messageContent: content }, 
+            {
             headers: { 'x-auth-token': token }
-        });
-        return response.data; // Return the sent message
+            }
+    );
+
+        return response.data;  // Return the sent message
     } catch (error) {
         console.error('Error sending message:', error);
-        throw error; // Re-throw the error for handling in the component
+        throw error;  // Re-throw the error for handling in the component
     }
 };

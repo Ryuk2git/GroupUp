@@ -1,88 +1,107 @@
 import { useState, useEffect } from 'react';
 import io from 'socket.io-client';
-import { fetchMembers, fetchMessages, sendMessage, fetchUserData } from '../utils/api.js';
-import { collection, query, orderBy, onSnapshot, addDoc } from "firebase/firestore";
-import { db } from "../../backend/config/firebase.js"; // Update with the correct path
 import '../styles/ChatArea.css';
+import { fetchMessages, sendMessage } from '../utils/api';
 
 const SOCKET_SERVER_URL = 'http://localhost:3000';
 
 function ChatArea({ selectedMember, currentUserId }) {
-  const [messages, setMessages] = useState([]);
-  const [messageInput, setMessageInput] = useState('');
-  const [contextMenu, setContextMenu] = useState(null);
-  const [socket, setSocket] = useState(null);
-  const [showVoiceCall, setShowVoiceCall] = useState(false);
-  const [showVideoCall, setShowVideoCall] = useState(false);
+  const [messages, setMessages] = useState([]); // State for messages
+  const [messageInput, setMessageInput] = useState(''); // State for input
+  const [socket, setSocket] = useState(null); // State for socket
+  const [showVoiceCall, setShowVoiceCall] = useState(false); // State for voice call
+  const [showVideoCall, setShowVideoCall] = useState(false); // State for video call
 
+  // UseEffect to initialize socket and listen for incoming messages
   useEffect(() => {
-    const newSocket = io(SOCKET_SERVER_URL);
+    if (!selectedMember) return;
+
+    const newSocket = io(SOCKET_SERVER_URL, {
+      query: { userId: currentUserId },
+    });
     setSocket(newSocket);
 
-    fetchMessages();
-
+    // Listen for messages from the server
     newSocket.on('message', (message) => {
-      setMessages((prevMessages) => [...prevMessages, message]);
+      if (message.senderId === selectedMember.id || message.receiverId === selectedMember.id) {
+        setMessages((prevMessages) => [...prevMessages, message]);
+      }
     });
 
-    return () => newSocket.disconnect();
-  }, [selectedMember]);
+    // Fetch previous messages
+    loadMessages();
 
-  const fetchMessages = async () => {
-    const token = localStorage.getItem('authToken');
+    // Cleanup on unmount or when selectedMember changes
+    return () => {
+      newSocket.disconnect();
+      setSocket(null);
+    };
+  }, [selectedMember, currentUserId]);
+
+  // Function to fetch previous messages
+  const loadMessages = async () => {
+    const token = localStorage.getItem('x-auth-token');
     try {
-      const response = await fetch(`/api/messages/${selectedMember.id}`, {
-        headers: {
-          'x-auth-token': token,
-          'Content-Type': 'application/json',
-        },
-      });
+      const response = await fetchMessages(currentUserId, selectedMember.id);
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
       const data = await response.json();
-      setMessages(data.messages);
+
+      // If messages are found, set them, otherwise show a placeholder message
+      if (data.messages && data.messages.length > 0) {
+        setMessages(data.messages);
+      } else {
+        setMessages([{ id: 'start-conversation', messageContent: 'Start a conversation!' }]);
+      }
     } catch (error) {
       console.error('Error fetching messages:', error);
     }
   };
 
-  const handleSendMessage = async () => {
-    if (messageInput.trim()) {
-      const newMessage = {
-        senderId: currentUserId, // Use the current user's ID
-        receiverId: selectedMember.id,
-        messageContent: messageInput,
-      };
+ const handleSendMessage = async () => {
+  if (messageInput.trim()) {
+    const newMessage = {
+      senderId: currentUserId,           // Current user's ID
+      receiverId: selectedMember.id,     // Friend's ID
+      content: messageInput,              // The message content
+    };
 
-      try {
-        // Send the message to the server
-        const response = await fetch('/api/messages/send', {
-          method: 'POST',
-          headers: { 
-            'Content-Type': 'application/json',
-            'x-auth-token': localStorage.getItem('x-auth-token'), // Include token in header
-          },
-          body: JSON.stringify(newMessage),
-        });
+    try {
+      // Send the message using sendMessage function
+      const response = await sendMessage(
+        newMessage.senderId,
+        newMessage.receiverId,
+        newMessage.content
+      );
 
-        if (response.ok) {
-          socket.emit('message', newMessage);
-          setMessageInput('');
-        } else {
-          const errorData = await response.json();
-          console.error('Error sending message:', errorData);
-        }
-      } catch (error) {
-        console.error('Error sending message:', error);
+      if (response) {
+        // Emit the message via socket to update the chat
+        socket.emit('message', newMessage);
+
+        // Clear the message input after sending
+        setMessageInput('');
+      } else {
+        console.error('Error sending message:', response);
       }
+    } catch (error) {
+      console.error('Error sending message:', error);
     }
-  };
+  }
+};
 
+
+  // Handle toggling voice call visibility
   const toggleVoiceCall = () => {
     setShowVoiceCall(!showVoiceCall);
   };
 
+  // Handle toggling video call visibility
   const toggleVideoCall = () => {
-    setShowVoiceCall(false); // Hide voice call
-    setShowVideoCall(true); // Show video call
+    setShowVoiceCall(false);
+    setShowVideoCall(true);
   };
 
   return (
@@ -100,11 +119,15 @@ function ChatArea({ selectedMember, currentUserId }) {
         </div>
       </div>
       <div className="chat-content">
-        {messages.map((message) => (
-          <div key={message.id} className="chat-message">
-            <strong>{message.senderId === currentUserId ? 'You' : selectedMember.name}:</strong> {message.messageContent}
-          </div>
-        ))}
+        {messages.length > 0 ? (
+          messages.map((message) => (
+            <div key={message.id || message.timestamp} className="chat-message">
+              <strong>{message.senderId === currentUserId ? 'You' : selectedMember.name}:</strong> {message.messageContent}
+            </div>
+          ))
+        ) : (
+          <div className="no-messages">No messages yet. Start a conversation!</div>
+        )}
       </div>
       <div className="chat-input">
         <textarea
@@ -121,59 +144,6 @@ function ChatArea({ selectedMember, currentUserId }) {
         <div className="add-media">+</div>
         <div className="send-message" onClick={handleSendMessage}>Send</div>
       </div>
-      {contextMenu && (
-        <div className="context-menu" style={{ top: `${contextMenu.y}px`, left: `${contextMenu.x}px` }}>
-          <div className="context-menu-item" onClick={() => handleDeleteMessage(contextMenu.messageId)}>
-            Delete Message
-          </div>
-        </div>
-      )}
-
-      {/* Voice Call Dropdown */}
-      {showVoiceCall && (
-        <div className="voice-call-dropdown">
-          <div className="voice-call-top">
-            {selectedMember.avatar ? (
-              <img src={selectedMember.avatar} alt="Caller Avatar" className="call-avatar" />
-            ) : (
-              <div className="call-avatar-placeholder">Caller</div>
-            )}
-            <img src="yourAvatar.png" alt="Your Avatar" className="call-avatar" />
-          </div>
-          <div className="voice-call-bottom">
-            <div className="mute-button" onClick={() => alert('Muted')}>
-              <i className="fas fa-microphone-slash"></i>
-            </div>
-            <div className="end-call-button" onClick={toggleVoiceCall}>
-              <i className="fas fa-phone-slash"></i>
-            </div>
-            <div className="video-call-button" onClick={toggleVideoCall}>
-              <i className="fas fa-video"></i>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Video Call Dropdown */}
-      {showVideoCall && (
-        <div className="video-call-dropdown">
-          <div className="video-call-top">
-            <div className="video-feed"></div>
-            <div className="video-feed"></div>
-          </div>
-          <div className="video-call-bottom">
-            <div className="mute-button" onClick={() => alert('Muted')}>
-              <i className="fas fa-microphone-slash"></i>
-            </div>
-            <div className="end-call-button" onClick={() => setShowVideoCall(false)}>
-              <i className="fas fa-phone-slash"></i>
-            </div>
-            <div className="switch-to-voice-button" onClick={() => { setShowVideoCall(false); setShowVoiceCall(true); }}>
-              <i className="fas fa-phone"></i>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

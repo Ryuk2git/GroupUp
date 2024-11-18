@@ -19,8 +19,16 @@ import Message from './models/Message.js';
 dotenv.config();
 
 const app = express();
+
 const server = http.createServer(app);
-const io = new Server(server); // Initialize Socket.IO with the server
+const io = new Server(server,
+    {
+        cors: {
+            origin: 'http://localhost:5173', // Your frontend origin
+            methods: ['GET', 'POST'],
+        },
+    }
+);
 
 // Middleware
 app.use(express.json()); // Body parser to parse JSON requests
@@ -92,53 +100,42 @@ app.use((err, req, res, next) => {
     console.error(`Error occurred at ${req.url}:`, err.stack);
     res.status(500).send({ error: 'Something went wrong!' });
 });
-
-// Message route for fetching messages (use your database connection here)
-app.get('/api/messages/:receiverId', async (req, res) => {
-    const { receiverId } = req.params;
-    try {
-      const messages = await Message.findAll({
-        where: { receiverId },
-        order: [['createdAt', 'ASC']],
-      });
-      res.json({ messages });
-    } catch (error) {
-      console.error('Error fetching messages:', error);
-      res.status(500).send('Server error');
-    }
-  });
-  
-// Message route for sending messages
-app.post('/api/messages/send', async (req, res) => {
-    const { senderId, receiverId, messageContent } = req.body;
-    try {
-        const newMessage = await Message.create({ senderId, receiverId, messageContent });
-        io.emit('message', newMessage); // Send to all connected clients
-        res.status(200).json(newMessage);
-    } catch (error) {
-        console.error('Error sending message:', error);
-        res.status(500).send('Server error');
-    }
-});  
+ 
 
 // Socket.IO connection handling
 io.on('connection', (socket) => {
-    console.log('New client connected: ' + socket.id);
+    console.log(`User connected: ${socket.id}`);
 
-    socket.on('message', async (message) => {
-        // Save the message to the database
-        const newMessage = await Message.create(message);
-        io.to(message.conversationId).emit('message', newMessage); // Broadcast to all clients in the conversation
+    // Listen for joining a conversation
+    socket.on('joinConversation', (conversationId) => {
+        socket.join(conversationId);
+        console.log(`User joined conversation: ${conversationId}`);
     });
 
-    socket.on('joinConversation', (conversationId) => {
-        socket.join(conversationId); // Join the conversation room
+    // Listen for new messages
+    socket.on('sendMessage', async (data) => {
+        const { conversationId, senderId, messageContent } = data;
+
+        try {
+            // Save the message to the database
+            const newMessage = await Message.create({
+                conversationId,
+                senderId,
+                messageContent,
+            });
+
+            // Emit the message to all users in the conversation
+            io.to(conversationId).emit('receiveMessage', newMessage);
+        } catch (error) {
+            console.error('Error saving message:', error);
+        }
     });
 
     socket.on('disconnect', () => {
-        console.log('Client disconnected: ' +  socket.id);
+        console.log(`User disconnected: ${socket.id}`);
     });
 });
+
 
 // Start server
 const PORT = process.env.PORT || 3000; // Use environment variable or hard-coded port

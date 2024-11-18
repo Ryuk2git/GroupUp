@@ -1,4 +1,5 @@
 import { DataTypes } from 'sequelize';
+import Message from './Message.js';
 import sequelize from '../config/database.js';
 
 const Conversations = sequelize.define('Conversations', {

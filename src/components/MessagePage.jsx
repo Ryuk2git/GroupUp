@@ -10,9 +10,9 @@ function searchedMembers(members, searchQuery) {
   );
 }
 
-function MemberItem({ member, onClick }) {
+function MemberItem({ member, friendId, onClick }) {
   return (
-    <div className="member-item" onClick={() => onClick(member)}>
+    <div className="member-item" onClick={() => onClick(member, friendId)}>
       <img src={member.avatar} alt={member.name} className="member-avatar" />
       <span>{member.name}</span> {/* This will display the friend's name */}
     </div>
@@ -45,9 +45,11 @@ function MessagePage({ userProfile }) {
   const [voiceChannels, setVoiceChannels] = useState([]);
   const [friends, setFriends] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedFriendId, setSelectedFriendId] = useState(null); // State for selected friend
   const [filteredMembers, setFilteredMembers] = useState([]);
   const [showSearch, setShowSearch] = useState(false);
   const localToken = localStorage.getItem('token');
+  const currentUserId = localStorage.getItem('userID');
 
   // Load members and friends data
   useEffect(() => {
@@ -82,14 +84,19 @@ function MessagePage({ userProfile }) {
     loadFriends();
   }, [localToken]);
 
+  const handleFriendClick = (friendId) => {
+    setSelectedFriendId(friendId); // Update selected friend id when clicked
+  };
+
   // Filter members based on search query
   useEffect(() => {
     const filtered = searchedMembers(members, searchQuery); // Use the searchedMembers function
     setFilteredMembers(filtered);
   }, [searchQuery, members]);
 
-  const handleMemberClick = (member) => {
+  const handleMemberClick = (member, friendId) => {
     setSelectedMember(member);
+    handleFriendClick(friendId);
     setSearchQuery('');
     setShowSearch(false);
   };
@@ -124,6 +131,8 @@ function MessagePage({ userProfile }) {
         setShowSearch(false); // Hide the search bar
       }
     }
+    console.log("Selected FirendID: ", selectedFriendId);
+
   };
 
   return (
@@ -148,6 +157,7 @@ function MessagePage({ userProfile }) {
                     name: friend.username, // Ensure that 'username' is the correct property from your backend
                     avatar: friend.avatar || 'https://via.placeholder.com/40' // Add avatar if available
                   }} // Ensure the member object matches the structure
+                  friendId={friend.friendId}
                   onClick={handleMemberClick}
                 />
               ))
@@ -177,8 +187,12 @@ function MessagePage({ userProfile }) {
         </div>
       </div>
       <div className="chat-area">
-        {selectedMember ? (
-          <ChatArea selectedMember={selectedMember} userProfile={userProfile} />
+        {selectedFriendId ? (
+          <ChatArea 
+            selectedMember={selectedMember} 
+            currentUserId={currentUserId} // Send currentUserId prop
+            selectedFriendId={selectedFriendId} // Pass selected friend ID to ChatArea
+          />
         ) : (
           <div>Select a member to start chatting</div>
         )}
