@@ -6,6 +6,7 @@ const API_URL_MESSAGE = 'http://localhost:3000/api/messages'; // Define the mess
 const API_URL_MEMBER = 'http://localhost:3000/api/members'; // Define the member API URL
 const API_URL_FRIENDS = 'http://localhost:3000/api/friends'; // Define the friends API URL
 const API_URL_VOICE_CHANNEL = 'http://localhost:3000/api/voiceChannels'; // Define the voice channel API URL
+const API_URL_PROJECT = 'http://localhost:3000/api/projects';
 
 export const loginUser = async (userData) => {
     const response = await axios.post(`${API_URL_AUTH}/login`, userData);
@@ -220,6 +221,49 @@ export const sendMessage = async (senderId, receiverId, content) => {
         return response.data;  // Return the sent message
     } catch (error) {
         console.error('Error sending message:', error);
+        throw error;  // Re-throw the error for handling in the component
+    }
+};
+
+export const fetchProjects = async (userID) => {
+    const token = localStorage.getItem('x-auth-token');
+    console.log("Project token: ", token );
+    if (!token) {
+        throw new Error('No token found');
+    }
+    try{
+        const response = await axios.post(`${API_URL_PROJECT}/${userID}`, 
+            {userToken: token}, {
+            headers: { 'x-auth-token': token }
+        });
+        return response;
+    }catch(error){
+        console.error('Error sending message:', error);
+        throw error;  // Re-throw the error for handling in the component
+    }
+
+};
+
+export const createProject = async (userID, projectName, description) => {
+    const token = localStorage.getItem('x-auth-token');
+    console.log("Project token: ", token );
+    if (!token) {
+        throw new Error('No token found');
+    }
+    try{
+        const response = await axios.post(`${API_URL_PROJECT}/create/${userID}`, 
+            {
+                projectName: projectName,
+                description: description,
+                userToken: token
+            }, 
+            {
+                headers: { 'x-auth-token': token }
+            }
+        );
+        return response;
+    }catch(error){
+        console.error('Error Creating Project:', error);
         throw error;  // Re-throw the error for handling in the component
     }
 };

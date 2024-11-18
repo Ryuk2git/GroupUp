@@ -41,7 +41,6 @@ export const fetchFriends = async (req, res) => {
     console.log("User ID from params: ", userID);
 
     const token = req.headers['x-auth-token']; // Get the token from headers
-    console.log("Token received: ", token);
 
     // Validate the token
     if (!token) {

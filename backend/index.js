@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+
 import authRoutes from './routes/authRoutes.js'; // Your auth routes
 import userRoutes from './routes/userRoute.js'; // Import user routes
 import fileRoutes from './routes/fileRoute.js'; // Your file routes
@@ -8,6 +9,8 @@ import conversationRoutes from './routes/conversationRoute.js'; // Import conver
 import messageRoutes from './routes/messageRoute.js'; // Import message routes
 import memberRoute from './routes/memberRoute.js';
 import friendsRoute from './routes/friendsRoute.js';
+import projectRoute from './routes/projectRoute.js';
+
 import { Sequelize } from 'sequelize';
 import bodyParser from 'body-parser';
 import morgan from 'morgan'; // For logging HTTP requests
@@ -81,6 +84,7 @@ app.use('/api/conversations', conversationRoutes); // Add conversations route
 app.use('/api/messages', messageRoutes); // Add messages route
 app.use('/api/members', memberRoute);
 app.use('/api/friends', friendsRoute); // Add friends route
+app.use('/api/projects', projectRoute);
 
 // Simple base route
 app.get('/', (req, res) => {

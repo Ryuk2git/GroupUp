@@ -31,13 +31,19 @@ const App = () => {
     }, []); // Run once on component mount
 
     return (
-            <Router>
-                <Routes>
-                    <Route path="/" element={<LoginPage />} />
-                    <Route path="/main" element={<MainPage userProfile={userProfile} setUserProfile={setUserProfile} />} />
-                    {/* <Route path="/main/projects" element={<ProjectPage />} /> Updated Project Page route */ }
-                </Routes>
-            </Router>
+        <Router>
+        <Routes>
+            <Route path="/" element={<LoginPage />} />
+            <Route 
+                path="/main" 
+                element={<MainPage initialComponent="MessagePage" />} 
+            />
+            <Route 
+                path="/main/projects" 
+                element={<MainPage initialComponent="ProjectPage" />} 
+            />
+        </Routes>
+    </Router>
     );
 };
 

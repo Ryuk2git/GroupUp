@@ -426,3 +426,74 @@ color: var(--accent-white);
 .chat-area::-webkit-scrollbar-track {
     background: var(--medium-gray); /* Background of the scrollbar track */
 }
+
+
+.add-project-box {
+    position: relative;
+    display: flex;
+    align-items: center;
+    margin: 1px;
+    justify-content: center;
+    cursor: pointer;
+    overflow: hidden;
+    border: 1px solid white;
+    border-radius: 10px; /* Circle shape */
+    padding: 5px;
+    margin-top: 20px; /* Add spacing between the profile box */
+    margin-bottom: 20px;
+    background-color: rgba(24, 19, 19, 0.8); /* Translucent background */
+    width: 57px; /* Initial size for the circle */
+    height: 57
+    px; /* Initial size for the circle */
+    transition: width 0.3s ease, height 0.3s ease, border-radius 0.3s ease; /* Smooth transitions */
+    z-index: 10;
+    position: relative;
+  }
+  
+  /* Expanded state of Add New Project Box */
+  .add-project-box.expanded {
+    width: 300px; /* Expanded width */
+    height: auto; /* Expanded height */
+    border-radius: 10px; /* Transition to rectangle */
+    justify-content: flex-start; /* Align items to the left */
+    padding: 20px;
+    transition: width 0.3s ease, height 0.3s ease, border-radius 0.3s ease; /* Smooth transitions */
+  }
+  
+  /* Title inside Add New Project box */
+  .add-project-title {
+    font-size: 1rem;
+    color: var(--accent-white);
+    margin: 0;
+  }
+  
+  /* New Project Form inside the expanded box */
+  .new-project-form {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-top: 10px;
+  }
+  
+  .new-project-form input {
+    padding: 8px;
+    margin-bottom: 10px;
+    width: 100%;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+  }
+  
+  .new-project-form button {
+    padding: 8px;
+    background-color: #4caf50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .new-project-form button:hover {
+    background-color: #45a049;
+  }
+  
+  
