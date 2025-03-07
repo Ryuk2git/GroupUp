@@ -1,0 +1,39 @@
+import React, { useState } from "react";
+import "../Styles/mainPageStyles.css";
+import Sidebar from "../Components/Sidebar";
+import Contextpanel from "../Components/ContextPanel";
+import Topbar from "../Components/Topbar";
+import ContentArea from "../Components/ContentArea";
+import RightSidebar from "../Components/RightSideBar";
+
+interface MainPageProps {
+  section: string;
+}
+
+const MainPage: React.FC<MainPageProps> = ({ section }) => {
+  const [activeSection, setActiveSection] = useState(section);
+
+  return (
+    <div className="main-page-container">
+      {/* Left Sidebar */}
+      <Sidebar setActiveSection={setActiveSection} />
+
+      {/* Recent Friends & Files Section */}
+      <Contextpanel activeSection={activeSection} />
+
+      {/* Main Content Area */}
+      <div className="main-content-wrapper">
+        {/* Top Bar */}
+        <Topbar />
+
+        {/* Dynamic Content Area */}
+        <ContentArea activeSection={activeSection} />
+      </div>
+
+      {/* Right Sidebar (Only Visible on Home) */}
+      {activeSection === "home" && <RightSidebar />}
+    </div>
+  );
+};
+
+export default MainPage;

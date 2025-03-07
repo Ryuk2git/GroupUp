@@ -1,0 +1,144 @@
+import { Request, Response, NextFunction } from 'express';
+import bcrypt from 'bcrypt';
+import { v4 as uuidv4 } from 'uuid';
+import User from '../models/users';
+import jwt from 'jsonwebtoken';
+
+const JWT_SECRET = '9552535317';
+
+export const registerUser = async (req: Request, res: Response) => {
+  const { name, userName, emailID, password, dateOfBirth, city, state, country } = req.body;
+
+  try {
+    if (await User.findOne({ where: { emailID } })) {
+      res.status(409).json({ message: 'User already exists' });
+      return;
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const newUser = await User.create({
+      userID: uuidv4(),
+      name,
+      userName,
+      emailID,
+      password: hashedPassword,
+      role: 'user', // Default role
+      dateOfBirth: dateOfBirth || null,
+      city: city || null,
+      state: state || null,
+      country: country || null,
+    });
+
+    const token = jwt.sign(
+      { userID: newUser.userID, emailID: newUser.emailID },
+      JWT_SECRET,
+      { expiresIn: '1h' }
+    );
+
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'none',
+      maxAge: 3600000, // 1hr
+    });
+
+    res.status(201).json({
+      message: 'Registration successful',
+      user: {
+        userID: newUser.getDataValue('userID'),
+        name: newUser.getDataValue('name'),
+        userName: newUser.getDataValue('userName'),
+        emailID: newUser.getDataValue('emailID'),
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Registration failed', error: error.message });
+  }
+};
+
+export const loginUser = async (req: Request, res: Response) => {
+  const { emailID, password } = req.body;
+
+  try {
+    const user = await User.findOne({ where: { emailID } });
+
+    if (!user) {
+      res.status(401).json({ message: 'Invalid email or password' });
+      return;
+    }
+
+    const isPasswordValid = await bcrypt.compare(password, user.getDataValue('password'));
+
+    if (!isPasswordValid) {
+      res.status(401).json({ message: 'Invalid email or password' });
+      return;
+    }
+
+    const token = jwt.sign(
+      { userID: user.userID, emailID: user.emailID },
+      JWT_SECRET,
+      { expiresIn: '1h' }
+    );
+
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 3600000, // 1hr
+    });
+
+    res.json({
+      message: 'Login successful',
+      user: {
+        userID: user.getDataValue('userID'),
+        name: user.getDataValue('name'),
+        userName: user.getDataValue('userName'),
+        emailID: user.getDataValue('emailID'),
+      }
+    });
+  } catch (error) {
+    console.error('Login error:', error);
+    res.status(500).json({ message: 'Login failed', error: error.message });
+  }
+};
+
+export const logoutUser = async (req: Request, res: Response) => {
+  res.clearCookie('token', {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'none', // Change to 'None' if using HTTPS and cross-origin
+  });
+  res.status(200).json({ message: 'Logout successful' });
+};
+
+export const verifyUser = async (req: Request, res: Response) => {
+  const token = req.cookies.token;
+  if(!token){
+    res.status(401).json({ message: 'Unauthorized' });
+    return;
+  }
+  try {
+    const decoded: any = jwt.verify(token, JWT_SECRET);
+    const user = await User.findByPk(decoded.userID, {
+      attributes: { exclude: ['password'] }
+    });
+
+    if(!user){
+      return res.status(401).json({ message: 'Unauthorized' });
+    }
+
+    res.json({
+      message: 'User verified',
+      user: {
+        userID: user.getDataValue('userID'),
+        name: user.getDataValue('name'),
+        userName: user.getDataValue('userName'),
+        emailID: user.getDataValue('emailID'),
+      }
+    });
+  }catch (error :any) {
+    console.error('Verification error:', error);
+    res.status(401).json({ message: 'Unauthorized' });
+  }
+
+}
