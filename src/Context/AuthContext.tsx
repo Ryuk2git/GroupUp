@@ -14,6 +14,7 @@ interface User {
 // Context type
 interface AuthContextType {
   user: User | null;
+  setUser: (user: User | null) => void;
   login: (emailID: string, password: string) => Promise<void>;
   register: (userData: { name: string; userName: string; emailID: string; password: string }) => Promise<void>;
   logout: () => void;
@@ -40,6 +41,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const storedUser = localStorage.getItem("user");
     if (storedUser) {
       setUser(JSON.parse(storedUser));
+    }else{
+      setUser(null);
     }
   }, []);
 
@@ -60,15 +63,21 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const logout = async () => {
-    await axios.post("/api/auth/logout", {}, { withCredentials: true });
-    setUser(null);
-    localStorage.removeItem("user");
-    localStorage.removeItem("activeSection");
-    navigate("/login");
+    try {
+      await axios.post("http://localhost:3000/api/auth/logout", {}, { withCredentials: true });
+      localStorage.removeItem("user");
+      localStorage.removeItem("activeSection");
+  
+      setUser(null);
+      navigate("/login");
+      window.location.reload(); // Only do this if necessary
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, register, logout }}>
+    <AuthContext.Provider value={{ user, setUser, login, register, logout }}>
       {children}
     </AuthContext.Provider>
   );

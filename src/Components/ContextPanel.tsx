@@ -1,15 +1,14 @@
 import React, { useState } from "react";
 import { useAuth } from "../Context/AuthContext";
-interface ContextSectionProps {
-  activeSection: string;
-}
+import ChatVoiceList from "./ChatVoiceList";
 
-const ContextSection: React.FC<ContextSectionProps> = () => {
+const ContextSection: React.FC = () => {
   const { logout } = useAuth();
   const [selectedProject, setSelectedProject] = useState<string | null>(null);
   const [isMuted, setIsMuted] = useState(false);
   const [isDeafened, setIsDeafened] = useState(false);
   const [animationClass, setAnimationClass] = useState<string>("");
+
   const user = JSON.parse(localStorage.getItem("user") || "{}");
   const userName = user.userName || "";
   const activeSection = localStorage.getItem("activeSection") || "home";
@@ -43,9 +42,9 @@ const ContextSection: React.FC<ContextSectionProps> = () => {
   const handleLogout = async () => {
     try {
       logout();
-      alert("Logged out successfully!");
+      console.log("Logged out successfully!");
       window.location.href = "/login";
-    } catch (error: unknown) {
+    } catch (error: any) {
       console.error("Logout failed", error);
     }
   };
@@ -71,15 +70,7 @@ const ContextSection: React.FC<ContextSectionProps> = () => {
 
       case "direct-message":
         return (
-          <>
-            <h4>Text Chats</h4>
-            <div className="main-recent-item">💬 General Chat</div>
-            <div className="main-recent-item">💬 Dev Discussions</div>
-
-            <h4>Audio Channels</h4>
-            <div className="main-recent-item">🔊 Standup Meeting</div>
-            <div className="main-recent-item">🔊 Lounge</div>
-          </>
+          <ChatVoiceList /> 
         );
 
         case "projects":

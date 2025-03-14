@@ -3,7 +3,11 @@ import bodyParser from 'body-parser';
 import passport from 'passport';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
+
 import authRoutes from './routes/authRoutes';
+import friendsRoutes from './routes/friendsRoutes'
+import voiceChannelRoutes from './routes/voiceChannelRoutes'
+
 import { initDB } from './config/db';
 import { apiLogger } from './middleware/apiLogger';
 import session from 'express-session';
@@ -21,7 +25,7 @@ app.use(cors({
 
 app.use(cookieParser());
 app.use(session({
-    secret: 'your_secret_key',
+    secret: '9552535317',
     resave: false,
     saveUninitialized: true,
 }));
@@ -33,6 +37,8 @@ app.use(apiLogger);
 
 // Routes
 app.use('/api/auth', authRoutes);
+app.use('/api', friendsRoutes);
+app.use('/api', voiceChannelRoutes);
 
 // Initialize databases and start the server
 initDB().then(() => {

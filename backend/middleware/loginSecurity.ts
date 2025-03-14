@@ -4,7 +4,7 @@ import { Request, Response, NextFunction } from "express";
 import { validationResult } from "express-validator";
 
 export const validateRegister = [
-    body('name').trim().isLength({ min: 3 }).escape().withMessage('Name must be at least 3 characters long'),
+    body('name').trim().isLength({ min: 3, }).escape().withMessage('Name must be at least 3 characters long'),
     body('userName').trim().isLength({ min: 3 }).escape().withMessage('Username must be at least 3 characters long'),
     body('emailID').trim().isEmail().normalizeEmail().withMessage('Invalid email address'),
     body('password')

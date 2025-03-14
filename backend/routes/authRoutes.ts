@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { registerUser, loginUser, logoutUser } from '../controllers/authController';
+import { registerUser, loginUser, logoutUser, verifyUser } from '../controllers/authController';
 import { checkValidationErrors, validateLogin, validateRegister, loginRateLimiter  } from '../middleware/loginSecurity';
 import passport from 'passport';
 
@@ -12,6 +12,9 @@ router.post('/login',checkValidationErrors, validateLogin, loginRateLimiter, log
 
 // Logout route
 router.post('/logout', logoutUser);
+
+// Verify User
+router.get('/verify', verifyUser);
 
 // Google OAuth
 router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));

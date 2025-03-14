@@ -40,7 +40,7 @@ const MainLayout: React.FC = () => {
   // Fallback to localStorage if no username in params
   const storedUserName = localStorage.getItem("userName") || "";
   
-  if (!user || (!userName && !storedUserName)) {
+  if (!user || (!userName && !storedUserName) ) {
     return <Navigate to="/login" />;
   }
 

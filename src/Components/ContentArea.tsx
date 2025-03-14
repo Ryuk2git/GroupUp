@@ -1,13 +1,15 @@
 import React from "react";
+import ChatArea from "../Components/chatArea";
+import { useChatVoice } from "../Context/ChatVoiceContext";
 
 interface ContentAreaProps {
   activeSection: string;
 }
 
-const ContentArea: React.FC<ContentAreaProps> = () => {
+const ContentArea: React.FC<ContentAreaProps> = ({ activeSection }) => {
+  const { selectUser } = useChatVoice();
+
   const renderContent = () => {
-    const activeSection = localStorage.getItem("activeSection") || "home";
-    
     switch (activeSection) {
       case "home":
         return (
@@ -17,12 +19,20 @@ const ContentArea: React.FC<ContentAreaProps> = () => {
             <div className="main-widget">🗓️ Upcoming Events</div>
           </div>
         );
-      case "chats":
-        return <p>💬 Chat Messages Here</p>;
+
+      case "direct-message":
+        return selectUser ? (
+          <ChatArea />
+        ) : (
+          <p>🔍 Select a chat to start messaging</p>
+        );
+
       case "projects":
         return <p>📂 Project Files</p>;
+
       case "tasks":
         return <p>📌 Task List</p>;
+
       default:
         return <p>Welcome to GroupUp!</p>;
     }

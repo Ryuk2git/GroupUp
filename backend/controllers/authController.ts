@@ -6,6 +6,41 @@ import jwt from 'jsonwebtoken';
 
 const JWT_SECRET = '9552535317';
 
+export const verifyUser = async (req: Request, res: Response) => {
+  const token = req.cookies.token;
+  if(!token){
+    res.status(401).json({ message: 'Unauthorized' });
+    return;
+  }
+
+  try{
+    const decoded = jwt.verify(token, JWT_SECRET) as { emailID: string };
+    const user = await User.findByPk(decoded.emailID, {
+      attributes: { exclude: ['password'] }
+    });
+    
+    if(!user){
+      res.status(401).json({ message: 'Unauthorized' });
+      return;
+    }
+    res.json({
+      message: 'User verified',
+      user: {
+        userID: user.getDataValue('userID'),
+        name: user.getDataValue('name'),
+        userName: user.getDataValue('userName'),
+        emailID: user.getDataValue('emailID'),
+      }
+    })
+    return;
+  }catch(error: any){
+    console.error("Failed to verify user: ", error);
+    res.status(401).json({ message: 'Unauthorized' });
+    return;
+  }
+
+};
+
 export const registerUser = async (req: Request, res: Response) => {
   const { name, userName, emailID, password, dateOfBirth, city, state, country } = req.body;
 
@@ -38,7 +73,7 @@ export const registerUser = async (req: Request, res: Response) => {
     res.cookie('token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'none',
+      sameSite: 'lax',
       maxAge: 3600000, // 1hr
     });
 
@@ -83,7 +118,7 @@ export const loginUser = async (req: Request, res: Response) => {
     res.cookie('token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
+      sameSite: 'lax',
       maxAge: 3600000, // 1hr
     });
 
@@ -106,39 +141,8 @@ export const logoutUser = async (req: Request, res: Response) => {
   res.clearCookie('token', {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
-    sameSite: 'none', // Change to 'None' if using HTTPS and cross-origin
+    sameSite: 'lax', // Change to 'None' if using HTTPS and cross-origin
+    path: "/",
   });
   res.status(200).json({ message: 'Logout successful' });
 };
-
-export const verifyUser = async (req: Request, res: Response) => {
-  const token = req.cookies.token;
-  if(!token){
-    res.status(401).json({ message: 'Unauthorized' });
-    return;
-  }
-  try {
-    const decoded: any = jwt.verify(token, JWT_SECRET);
-    const user = await User.findByPk(decoded.userID, {
-      attributes: { exclude: ['password'] }
-    });
-
-    if(!user){
-      return res.status(401).json({ message: 'Unauthorized' });
-    }
-
-    res.json({
-      message: 'User verified',
-      user: {
-        userID: user.getDataValue('userID'),
-        name: user.getDataValue('name'),
-        userName: user.getDataValue('userName'),
-        emailID: user.getDataValue('emailID'),
-      }
-    });
-  }catch (error :any) {
-    console.error('Verification error:', error);
-    res.status(401).json({ message: 'Unauthorized' });
-  }
-
-}
