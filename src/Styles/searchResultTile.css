@@ -1,0 +1,73 @@
+.search-result-tile {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.2s ease-in-out;
+  }
+  
+  .search-result-tile:hover {
+    background: rgba(0, 0, 0, 0.1);
+  }
+  
+  .search-left {
+    margin-right: 10px;
+  }
+  
+  .search-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+  }
+  
+  .search-icon {
+    font-size: 20px;
+  }
+  
+  .search-center {
+    flex-grow: 1;
+  }
+  
+  .search-title {
+    font-weight: bold;
+  }
+  
+  .search-subtitle {
+    font-size: 12px;
+    color: gray;
+  }
+  
+  .search-right {
+    display: flex;
+    gap: 5px;
+  }
+  
+  .search-action-button {
+    padding: 5px 10px;
+    border: none;
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 12px;
+  }
+  
+  .search-action-button.add-friend {
+    background: green;
+    color: white;
+  }
+  
+  .search-action-button.chat {
+    background: blue;
+    color: white;
+  }
+  
+  .search-action-button.block {
+    background: red;
+    color: white;
+  }
+  
+  .search-action-button.unfriend {
+    background: orange;
+    color: white;
+  }
+  

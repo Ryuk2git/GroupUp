@@ -9,9 +9,9 @@ const ContextSection: React.FC = () => {
   const [isDeafened, setIsDeafened] = useState(false);
   const [animationClass, setAnimationClass] = useState<string>("");
 
-  const user = JSON.parse(localStorage.getItem("user") || "{}");
+  const user = JSON.parse(sessionStorage.getItem("user") || "{}");
   const userName = user.userName || "";
-  const activeSection = localStorage.getItem("activeSection") || "home";
+  const activeSection = sessionStorage.getItem("activeSection") || "home";
 
   const sectionTitles: Record<string, string> = {
     home: "Recent Activity & Quick Access",

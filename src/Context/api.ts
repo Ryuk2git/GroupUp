@@ -14,7 +14,7 @@ interface AuthPayload {
 }
 
 const getUserId = () =>{
-    const storedUserId = localStorage.getItem('user');
+    const storedUserId = sessionStorage.getItem('user');
     return storedUserId? JSON.parse(storedUserId).userID:null;
 };
 
@@ -88,3 +88,58 @@ export const getVoiceChannels = async() =>{
 };
 
 export const addFriend = async() =>{};
+
+export const fetchNotifications = async(userId: string) => {
+    try{
+        const response = await axios.get(`${API_URL}notifications/${userId}`)
+        return response.data;
+    }catch(error: any){
+        console.error("Error fetching Notificaitons", error);
+        return [];
+    }
+};
+
+export const markNotificationAsRead = async(userId: string, notificationId: string) =>{
+    try{
+        await axios.put(`${API_URL}notifications/${userId}/mark-read`, { notificationId });
+    }catch (error) {
+        console.error("Error marking notification as read:", error);
+    }
+};
+
+export const deleteNotification = async(userId: string, notificationId: string) =>{
+    try{
+        await axios.delete(`${API_URL}notifications/${userId}/${notificationId}`);
+    }catch(error) {
+        console.error("Error deleting notification:", error);
+    }
+};
+export const deleteAllNotifications = async(userId: string) =>{
+    try{
+        await axios.delete(`${API_URL}notifications/${userId}/clear-all`);
+        
+    }catch (error) {
+        console.error("Error deleting all notifications:", error);
+    }
+};
+
+export const fetchSearchResults = async (query: string, category: string): Promise<any[]> => {
+    try{
+      if(!query.trim()) {
+        return []; // Return an empty array if the query is empty
+      }
+  
+      const response = await axios.get(`/api/search`, {
+        params: {
+          q: query,
+          type: category === "All" ? undefined : category.toLowerCase(),
+        },
+      });
+  
+      // Ensure the response is an array
+      return Array.isArray(response.data) ? response.data : [];
+    }catch(error: any) {
+      console.error("Error fetching search results:", error);
+      return []; // Return an empty array in case of an error
+    }
+};

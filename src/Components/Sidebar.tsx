@@ -37,7 +37,7 @@ const Sidebar: React.FC<SidebarProps> = ({ setActiveSection }) => {
   const [activeSection, setActiveSectionState] = useState<string>("");
 
   useEffect(() => {
-    const storedSection = localStorage.getItem("activeSection");
+    const storedSection = sessionStorage.getItem("activeSection");
     if (storedSection) {
       setActiveSection(storedSection);
       setActiveSectionState(storedSection);
@@ -53,8 +53,8 @@ const Sidebar: React.FC<SidebarProps> = ({ setActiveSection }) => {
   const handleNavItemClick = (section: string) => {
     setActiveSection(section);
     setActiveSectionState(section);
-    localStorage.setItem("activeSection", section);
-    const user = JSON.parse(localStorage.getItem("user") || "{}");
+    sessionStorage.setItem("activeSection", section);
+    const user = JSON.parse(sessionStorage.getItem("user") || "{}");
     const userName = user.userName || "";
     navigate(`/${userName}/${section}`);
   };

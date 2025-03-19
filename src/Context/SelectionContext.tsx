@@ -26,7 +26,7 @@ export const SelectionProvider: React.FC<{ children: ReactNode }> = ({ children 
   const [selectedItem, setSelectedItem] = useState<SelectedItem | null>(null);
 
   useEffect(() => {
-    const storedSelection = localStorage.getItem("activeSelection");
+    const storedSelection = sessionStorage.getItem("activeSelection");
     if (storedSelection) {
       const type: SelectionType = JSON.parse(storedSelection);
       setSelectedItem((prev) => (prev ? { ...prev, type } : { type, data: null }));

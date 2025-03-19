@@ -38,7 +38,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const storedUser = localStorage.getItem("user");
+    const storedUser = sessionStorage.getItem("user");
     if (storedUser) {
       setUser(JSON.parse(storedUser));
     }else{
@@ -50,7 +50,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const login = async (emailID: string, password: string) => {
     const response = await loginUser({ emailID, password });
     setUser({ userID: response.user.userID, emailID: response.user.emailID, userName: response.user.userName });
-    localStorage.setItem("user", JSON.stringify(response.user));
+    sessionStorage.setItem("user", JSON.stringify(response.user));
+    sessionStorage.
     navigate(`/${response.user.userName}/main`);
   };
 
@@ -58,15 +59,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const register = async (userData: { name: string; userName: string; emailID: string; password: string }) => {
     const response = await registerUser(userData);
     setUser({ userID: response.user.userID, emailID: response.user.emailID, userName: response.user.userName });
-    localStorage.setItem("user", JSON.stringify(response.user));
+    sessionStorage.setItem("user", JSON.stringify(response.user));
     navigate(`/${response.user.userName}/main`);
   };
 
   const logout = async () => {
     try {
       await axios.post("http://localhost:3000/api/auth/logout", {}, { withCredentials: true });
-      localStorage.removeItem("user");
-      localStorage.removeItem("activeSection");
+      sessionStorage.removeItem("user");
+      sessionStorage.removeItem("activeSection");
   
       setUser(null);
       navigate("/login");

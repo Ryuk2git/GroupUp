@@ -37,8 +37,8 @@ const MainLayout: React.FC = () => {
   const { user } = useAuth();
   const { userName } = useParams<{ userName: string; section: string }>();
 
-  // Fallback to localStorage if no username in params
-  const storedUserName = localStorage.getItem("userName") || "";
+  // Fallback to sessionStorage if no username in params
+  const storedUserName = sessionStorage.getItem("userName") || "";
   
   if (!user || (!userName && !storedUserName) ) {
     return <Navigate to="/login" />;

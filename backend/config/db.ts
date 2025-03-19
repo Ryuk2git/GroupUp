@@ -20,10 +20,10 @@ const sequelize = new Sequelize('groupproxy', 'root', 'Rishi',
 );
 
 // MongoDB (Mongoose) Configuration
-const connectMongoDB = async (): Promise<void> => {
+const connectMongoDB = async (): Promise<void> => {   
   try {
-    await mongoose.connect('mongodb://localhost:27017/callAb');
-    console.log("MongoDB connected successfully!");
+    await mongoose.connect('mongodb://localhost:27017/GroupUp');
+    console.log("MongoDB connected successfully to: ", mongoose.connection.name);
   } catch (error) {
     console.error("MongoDB connection error:", error);
     process.exit(1);

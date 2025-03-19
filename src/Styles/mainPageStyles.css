@@ -347,9 +347,9 @@
 .search-suggestions {
   position: absolute;
   width: 100%;
-  background: var(--dark-gray);
+  background: var(--dark-background);
   border-radius: 6px;
-  max-height: 200px;
+  max-height: 400px;
   overflow-y: auto;
   list-style: none;
   padding: 0;
@@ -380,6 +380,22 @@
   background-color: var(--hover-gray);
   transform: translateX(4px);
 }
+
+.search-loading {
+  padding: 10px;
+  color: #666;
+  font-style: italic;
+}
+
+.search-error {
+  padding: 10px;
+  color: #ff4444;
+}
+
+.no-results {
+  padding: 10px;
+  color: #666;
+}
     
     /* Icons */
     .main-topbar-icons {
@@ -394,6 +410,130 @@
       cursor: pointer;
       font-size: 18px;
     }
+
+   /* NOTIFCAITON DROPDOWN */
+   .user-notification-container {
+    position: relative;
+    display: inline-block;
+  }
+
+  .user-notification-header {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding: 8px 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    font-size: 14px;
+    font-weight: bold;
+    color: #fff;
+  }
+  
+  
+  .user-notification-dropdown {
+    position: absolute;
+    top: 150%;
+    right: 0; 
+    background: var(--dark-background);
+    width: 320px;
+    max-height: 400px;
+    overflow-y: auto;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    padding: 10px;
+    z-index: 1000;
+  }
+  
+  /* Notification Header */
+  .user-notification-header {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding: 8px 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    font-size: 16px;
+    font-weight: bold;
+    color: #fff;
+  }
+  
+  /* Individual Notification Item */
+  .user-notification-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    cursor: pointer;
+    transition: background 0.2s ease-in-out;
+  }
+  
+  .user-notification-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+  }
+  
+  /* Notification Icon */
+  .user-notification-icon {
+    width: 32px;
+    height: 32px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    color: #fff;
+  }
+  
+  /* Notification Content */
+  .user-notification-content {
+    flex-grow: 1;
+    color: #ccc;
+    font-size: 14px;
+  }
+  
+  /* Mark As Read Button */
+  .user-notification-mark-read {
+    background: none;
+    border: none;
+    color: #4caf50;
+    font-size: 14px;
+    cursor: pointer;
+  }
+  
+  /* Delete Notification Button */
+  .user-notification-delete {
+    background: none;
+    border: none;
+    color: #ff4d4d;
+    font-size: 14px;
+    cursor: pointer;
+  }
+  
+  /* Unread Notifications - Bold Text */
+  .user-notification-unread {
+    font-weight: bold;
+    color: #fff;
+  }
+  
+  /* Notification Badge */
+  .user-notification-badge {
+    background: red;
+    color: white;
+    font-size: 12px;
+    font-weight: bold;
+    padding: 3px 7px;
+    border-radius: 50%;
+    position: absolute;
+    top: 5px;
+    right: 5px;
+  }
+  
+  /* Empty Notifications Message */
+  .user-notification-empty {
+    text-align: center;
+    padding: 15px;
+    font-size: 14px;
+    color: #aaa;
+  }
   
   /* ===================================
      DYNAMIC CONTENT AREA

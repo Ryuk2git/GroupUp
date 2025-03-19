@@ -6,7 +6,9 @@ import cookieParser from 'cookie-parser';
 
 import authRoutes from './routes/authRoutes';
 import friendsRoutes from './routes/friendsRoutes'
-import voiceChannelRoutes from './routes/voiceChannelRoutes'
+import voiceChannelRoutes from './routes/voiceChannelRoutes';
+import notificationRoutes from './routes/notificationRoutes';
+import searchRoutes from './routes/serachRoutes'
 
 import { initDB } from './config/db';
 import { apiLogger } from './middleware/apiLogger';
@@ -39,6 +41,8 @@ app.use(apiLogger);
 app.use('/api/auth', authRoutes);
 app.use('/api', friendsRoutes);
 app.use('/api', voiceChannelRoutes);
+app.use('/api/notifications', notificationRoutes);
+app.use('/api/search', searchRoutes);
 
 // Initialize databases and start the server
 initDB().then(() => {
