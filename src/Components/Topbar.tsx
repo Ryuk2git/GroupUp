@@ -9,7 +9,7 @@ const searchCategories = ["All", "Chats", "Projects", "Files", "Mail", "Tasks", 
 
 const Topbar: React.FC = () => {
   const { user } = useAuth();
-  const userId = user?.userID;
+  const currentUserId = user?.userID;
 
   // Search states
   const [searchCategory, setSearchCategory] = useState<string>("All");
@@ -44,13 +44,13 @@ const Topbar: React.FC = () => {
 
         console.log("Search Category is: ", searchCategory)
         const response = await axios.get(`http://localhost:3000/api/search`, {
-          params: { query, category },
+          params: { query, category, currentUserId },
           cancelToken: cancelTokenSource.current.token,
         });
 
         const { users = [], projects = [], files = [], tasks = [], events = [] } = response.data;
         const flattenedResults = [
-          ...users.map((user: any) => ({ type: "User", ...user })),
+          ...users.map((user: any) => ({ type: "Chats", ...user })),
           ...projects.map((project: any) => ({ type: "Project", ...project })),
           ...files.map((file: any) => ({ type: "File", ...file })),
           ...tasks.map((task: any) => ({ type: "Task", ...task })),
@@ -58,6 +58,7 @@ const Topbar: React.FC = () => {
         ];
 
         setSearchResults(flattenedResults);
+        console.log(response.data);
         setShowSuggestions(flattenedResults.length > 0);
       } catch (error) {
         if (!axios.isCancel(error)) {
@@ -87,16 +88,16 @@ const Topbar: React.FC = () => {
   // Fetch notifications
   useEffect(() => {
     const loadNotifications = async () => {
-      if (!userId) return;
+      if (!currentUserId) return;
       try {
-        const data = await fetchNotifications(userId);
+        const data = await fetchNotifications(currentUserId);
         setNotifications(data || []);
       } catch (error) {
         console.error("Error loading notifications:", error);
       }
     };
     loadNotifications();
-  }, [userId]);
+  }, [currentUserId]);
 
   // Click outside handler
   useEffect(() => {
@@ -137,9 +138,9 @@ const Topbar: React.FC = () => {
   const toggleNotificationDropdown = () => setShowNotificationDropdown((prev) => !prev);
 
   const handleMarkAsRead = async (notificationId: string) => {
-    if (!userId) return;
+    if (!currentUserId) return;
     try {
-      await markNotificationAsRead(userId, notificationId);
+      await markNotificationAsRead(currentUserId, notificationId);
       setNotifications((prev) =>
         prev.map((notif) => (notif._id === notificationId ? { ...notif, read: true } : notif))
       );
@@ -149,9 +150,9 @@ const Topbar: React.FC = () => {
   };
 
   const handleDeleteNotification = async (notificationId: string) => {
-    if (!userId) return;
+    if (!currentUserId) return;
     try {
-      await deleteNotification(userId, notificationId);
+      await deleteNotification(currentUserId, notificationId);
       setNotifications((prev) => prev.filter((notif) => notif._id !== notificationId));
     } catch (error) {
       console.error("Error deleting notification:", error);
@@ -159,9 +160,9 @@ const Topbar: React.FC = () => {
   };
 
   const handleDeleteAllNotifications = async () => {
-    if (!userId) return;
+    if (!currentUserId) return;
     try {
-      await deleteAllNotifications(userId);
+      await deleteAllNotifications(currentUserId);
       setNotifications([]);
     } catch (error) {
       console.error("Error clearing notifications:", error);
