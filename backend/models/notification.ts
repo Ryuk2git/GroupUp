@@ -7,6 +7,7 @@ export enum NotificationType {
   REMINDER = "reminder",
   FILE_SHARE = "file_share",
   MAIL = "Mail",
+  FRIEND_REQUEST_ACCEPTED = "FRIEND_REQUEST_ACCEPTED",
 }
 
 // Define Content Type

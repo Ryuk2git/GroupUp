@@ -1,9 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
 import "../Styles/searchResultTile.css";
+import { addFriend } from "../Context/api";
+import { useAuth } from "../Context/AuthContext";
 
 // Define the types of search results
 interface SearchResultItem {
-  id: string;
+  userID: string;
   type: "Chats" | "Project" | "File" | "Mail" | "Task" | "Event";
   name: string;
   friendshipStatus?: string | null; // Only applicable for chat results
@@ -23,8 +25,27 @@ interface SearchResultTileProps {
 }
 
 const SearchResultTile: React.FC<SearchResultTileProps> = ({ item, onSelect }) => {
-  console.log(`friendship status for username: ${item.name} IS ${item.friendshipStatus}`);
-  console.log("item type is: ", item.type);
+  const [friendshipStatus, setFriendshipStatus] = useState(item.friendshipStatus);
+  const { user } = useAuth();
+  const currentUserId = user?.userID;
+  const friendId = item.userID;
+  console.log("friend id is: " , friendId);
+  console.log("friendship status is: " , item.friendshipStatus);
+
+  const handleAddFreind = async(event: React.MouseEvent) => {
+    event.stopPropagation();
+    try{
+      if (currentUserId) {
+        await addFriend(item.userID, currentUserId);
+      } else {
+        console.error("Current user ID is undefined");
+      }
+      setFriendshipStatus("pending");
+    }catch(error: any){
+      console.error("Failed to send friend Request");
+    }
+  };
+
   // Function to get an appropriate icon/avatar
   const getIcon = () => {
     if (item.type === "Chats") {
@@ -91,7 +112,7 @@ const SearchResultTile: React.FC<SearchResultTileProps> = ({ item, onSelect }) =
   };
 
   const renderChatButtons = () => {
-    if (item.friendshipStatus === "accepted") {
+    if (friendshipStatus === "accepted") {
       return (
         <>
           <button className="search-action-button chat">Chat</button>
@@ -99,10 +120,10 @@ const SearchResultTile: React.FC<SearchResultTileProps> = ({ item, onSelect }) =
           <button className="search-action-button unfriend">Unfriend</button>
         </>
       );
-    } else if (item.friendshipStatus === "pending") {
+    } else if (friendshipStatus === "pending") {
       return <button className="search-action-button pending">Request Sent</button>;
     } else {
-      return <button className="search-action-button add-friend">Add Friend</button>;
+      return <button className="search-action-button add-friend" onClick={handleAddFreind}>Add Friend</button>;
     }
   };
 

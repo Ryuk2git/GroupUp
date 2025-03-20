@@ -87,7 +87,32 @@ export const getVoiceChannels = async() =>{
     }
 };
 
-export const addFriend = async() =>{};
+export const addFriend = async(friendId: string, currentUserId: string) =>{
+    try{
+        const response = await axios.post(
+            `${API_URL}friends/request`, 
+            {friendId, currentUserId}
+        );
+        return response.data;
+    }catch(error: any){
+        console.error("Error sending friend request:", error);
+        throw error;
+    }
+};
+
+export const acceptFriendRequest = async (friendRequestId: string, currentUserId: string, notificationId:string) => {
+    try {
+      const response = await axios.put(`${API_URL}friends/accept`, {
+        friendRequestId,
+        currentUserId,
+        notificationId,
+      });
+      return response.data;
+    } catch (error: any) {
+      console.error("Error accepting friend request:", error);
+      throw error;
+    }
+  };
 
 export const fetchNotifications = async(userId: string) => {
     try{
@@ -116,7 +141,7 @@ export const deleteNotification = async(userId: string, notificationId: string) 
 };
 export const deleteAllNotifications = async(userId: string) =>{
     try{
-        await axios.delete(`${API_URL}notifications/${userId}/clear-all`);
+        await axios.delete(`${API_URL}notifications/${userId}`);
         
     }catch (error) {
         console.error("Error deleting all notifications:", error);

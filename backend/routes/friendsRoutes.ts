@@ -1,14 +1,16 @@
 import { Router } from "express";
-import { getFriends } from "../controllers/friendsController";
+import { approveFriendRequest, getFriends, sendFriendRequest } from "../controllers/friendsController";
 
 const router = Router();
 
 // Route to fetch friends for a given userId
-router.get("/friends", getFriends); // returns fried: userName, emailId, userId, pfpRoute
+router.get("/", getFriends); // returns fried: userName, emailId, userId, pfpRoute
 
-// addFriend
+router.post("/request", sendFriendRequest);
+
+router.put("/accept", approveFriendRequest);
+
 // getPendingRequests
-// acceptRequest
 // rejectrequest
 // Unfreind friend
 // search Friends

@@ -105,12 +105,16 @@ export const deleteAllNotification = async (req: Request, res: Response) => {
   try {
     const { userId } = req.params;
 
+    // Check if userId is 'clear-all' (which is incorrect)
+    if (userId === "clear-all") {
+      res.status(400).json({ error: "Invalid userId" });
+      return;
+    }
+
     await NotificationModel.deleteMany({ userId });
 
     res.status(200).json({ message: "All notifications cleared" });
-    return;
   } catch (error) {
-    res.status(500).json({ error: "Server Error", details: error });
-    return;
+    res.status(500).json({ error: "Server Error", details: error.message });
   }
 };

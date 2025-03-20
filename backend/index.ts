@@ -39,7 +39,7 @@ app.use(apiLogger);
 
 // Routes
 app.use('/api/auth', authRoutes);
-app.use('/api', friendsRoutes);
+app.use('/api/friends', friendsRoutes);
 app.use('/api', voiceChannelRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/search', searchRoutes);

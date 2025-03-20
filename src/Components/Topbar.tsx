@@ -1,11 +1,51 @@
-import React, { useState, useEffect, useMemo, useRef, useCallback } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { debounce } from "lodash";
 import axios from "axios";
-import { fetchNotifications, markNotificationAsRead, deleteNotification, deleteAllNotifications } from "../Context/api";
+import { fetchNotifications, markNotificationAsRead, deleteNotification, deleteAllNotifications, acceptFriendRequest } from "../Context/api";
 import { useAuth } from "../Context/AuthContext";
 import SearchResultTile from "./searchResultTile";
 
 const searchCategories = ["All", "Chats", "Projects", "Files", "Mail", "Tasks", "Events"];
+
+interface NotificationTileProps {
+  notification: any;
+  onAccept?: (senderId: string, notificationId: string) => void;
+  onDecline?: (id: string) => void;
+  onDismiss?: (id: string) => void;
+  onSnooze?: (id: string) => void;
+}
+
+const NotificationTile: React.FC<NotificationTileProps> = ({ 
+  notification, 
+  onAccept, 
+  onDecline, 
+  onDismiss, 
+  onSnooze 
+}) => {
+  const { senderId, message } = notification.content;
+
+  return (
+    <li className={notification.read ? "notification-read" : "notification-unread"}>
+      <span>{message}</span>
+
+      {/* Friend Request Actions */}
+      {notification.type === "friend_request" && (
+        <div className="notification-actions">
+          <button onClick={() => onAccept?.(senderId, notification._id)}>✅ Accept</button>
+          <button onClick={() => onDecline?.(senderId)}>❌ Decline</button>
+        </div>
+      )}
+
+      {/* Event/Task Actions */}
+      {(notification.type === "event" || notification.type === "task") && (
+        <div className="notification-actions">
+          <button onClick={() => onDismiss?.(notification._id)}>✖ Dismiss</button>
+          <button onClick={() => onSnooze?.(notification._id)}>⏳ Snooze</button>
+        </div>
+      )}
+    </li>
+  );
+};
 
 const Topbar: React.FC = () => {
   const { user } = useAuth();
@@ -91,6 +131,7 @@ const Topbar: React.FC = () => {
       if (!currentUserId) return;
       try {
         const data = await fetchNotifications(currentUserId);
+        console.log("fetched Notifications: ", data);
         setNotifications(data || []);
       } catch (error) {
         console.error("Error loading notifications:", error);
@@ -138,7 +179,10 @@ const Topbar: React.FC = () => {
   const toggleNotificationDropdown = () => setShowNotificationDropdown((prev) => !prev);
 
   const handleMarkAsRead = async (notificationId: string) => {
-    if (!currentUserId) return;
+    if (!currentUserId) {
+      console.error("Current user ID is undefined");
+      return;
+    }
     try {
       await markNotificationAsRead(currentUserId, notificationId);
       setNotifications((prev) =>
@@ -150,7 +194,10 @@ const Topbar: React.FC = () => {
   };
 
   const handleDeleteNotification = async (notificationId: string) => {
-    if (!currentUserId) return;
+    if (!currentUserId) {
+      console.error("Current user ID is undefined");
+      return;
+    }
     try {
       await deleteNotification(currentUserId, notificationId);
       setNotifications((prev) => prev.filter((notif) => notif._id !== notificationId));
@@ -160,13 +207,65 @@ const Topbar: React.FC = () => {
   };
 
   const handleDeleteAllNotifications = async () => {
-    if (!currentUserId) return;
+    if (!currentUserId) {
+      console.error("Current user ID is undefined");
+      return;
+    }
     try {
       await deleteAllNotifications(currentUserId);
       setNotifications([]);
     } catch (error) {
       console.error("Error clearing notifications:", error);
     }
+  };
+
+  const handleAcceptFriendRequest = async (senderId: string, notificationId:string) => {
+    if (!currentUserId) {
+      console.error("Current user ID is undefined");
+      return;
+    }
+    try {
+      // Call the acceptFriendRequest API function
+      await acceptFriendRequest(senderId, currentUserId, notificationId);
+
+      // Update notifications state to remove the accepted request
+      setNotifications((prev) => prev.filter((notif) => notif.senderId !== senderId));
+    } catch (error) {
+      console.error("Error accepting friend request:", error);
+    }
+  };
+
+  const handleDeclineFriendRequest = async (notificationId: string) => {
+    if (!currentUserId) {
+      console.error("Current user ID is undefined");
+      return;
+    }
+    console.log("Declined friend request:", notificationId);
+    try {
+      await deleteNotification(currentUserId, notificationId);
+      setNotifications((prev) => prev.filter((notif) => notif._id !== notificationId));
+    } catch (error) {
+      console.error("Error declining friend request:", error);
+    }
+  };
+
+  const handleDismissNotification = async (notificationId: string) => {
+    if (!currentUserId) {
+      console.error("Current user ID is undefined");
+      return;
+    }
+    console.log("Dismissed notification:", notificationId);
+    try {
+      await deleteNotification(currentUserId, notificationId);
+      setNotifications((prev) => prev.filter((notif) => notif._id !== notificationId));
+    } catch (error) {
+      console.error("Error dismissing notification:", error);
+    }
+  };
+
+  const handleSnoozeNotification = async (notificationId: string) => {
+    console.log("Snoozed notification:", notificationId);
+    // TODO: Implement snooze functionality
   };
 
   return (
@@ -224,12 +323,20 @@ const Topbar: React.FC = () => {
                 <button className="user-noitification-clear" onClick={handleDeleteAllNotifications}>Clear All</button>
               </div>
               <ul>
-                {notifications.length > 0 ? notifications.map((notif) => (
-                  <li key={notif._id} className={notif.read ? "" : "unread"}>
-                    <span onClick={() => handleMarkAsRead(notif._id)}>{notif.message}</span>
-                    <button onClick={() => handleDeleteNotification(notif._id)}>✖</button>
-                  </li>
-                )) : <li>No notifications</li>}
+                {notifications.length > 0 ? (
+                  notifications.map((notif) => (
+                    <NotificationTile
+                      key={notif._id}
+                      notification={notif}
+                      onAccept={handleAcceptFriendRequest}
+                      onDecline={handleDeclineFriendRequest}
+                      onDismiss={handleDismissNotification}
+                      onSnooze={handleSnoozeNotification}
+                    />
+                  ))
+                ) : (
+                  <li>No notifications</li>
+                )}
               </ul>
             </div>
           </div>
