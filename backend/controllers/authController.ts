@@ -3,8 +3,29 @@ import bcrypt from 'bcrypt';
 import { v4 as uuidv4 } from 'uuid';
 import User from '../models/users';
 import jwt from 'jsonwebtoken';
+import fs from "fs";
+import path from "path";
 
 const JWT_SECRET = '9552535317';
+
+const initializeUserStorage = (userID: string): void => {
+  if (!userID) {
+    console.error("User ID is required to create storage.");
+    return;
+  }
+
+  const userStoragePath = path.join(__dirname, "../../storage", userID);
+  const projectPath = path.join(userStoragePath, "projects");
+  const drivePath = path.join(userStoragePath, "drive");
+
+  [userStoragePath, projectPath, drivePath].forEach((dir) => {
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+      console.log(`Created directory: ${dir}`);
+    }
+  });
+};
+
 
 export const verifyUser = async (req: Request, res: Response) => {
   const token = req.cookies.token;
@@ -50,9 +71,11 @@ export const registerUser = async (req: Request, res: Response) => {
       return;
     }
 
+    const userId = uuidv4();
+
     const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = await User.create({
-      userID: uuidv4(),
+      userID: userId,
       name,
       userName,
       emailID,
@@ -63,6 +86,8 @@ export const registerUser = async (req: Request, res: Response) => {
       state: state || null,
       country: country || null,
     });
+
+    initializeUserStorage(userId);
 
     const token = jwt.sign(
       { userID: newUser.userID, emailID: newUser.emailID },

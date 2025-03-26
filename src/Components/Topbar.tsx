@@ -15,37 +15,40 @@ interface NotificationTileProps {
   onSnooze?: (id: string) => void;
 }
 
-const NotificationTile: React.FC<NotificationTileProps> = ({ 
-  notification, 
-  onAccept, 
-  onDecline, 
-  onDismiss, 
-  onSnooze 
-}) => {
-  const { senderId, message } = notification.content;
+const NotificationTile: React.FC<NotificationTileProps> = ({ notification, onAccept, onDecline, onDismiss, onSnooze }) => {
+  const { senderId, message, userName, email } = notification.content;
 
   return (
-    <li className={notification.read ? "notification-read" : "notification-unread"}>
-      <span>{message}</span>
+    <li className={`user-notification-item ${notification.read ? "user-notification-read" : "user-notification-unread"}`}>
+      <div className="user-notification-info">
+        {/* Friend Request: Show User Details */}
+        {notification.type === "friend_request" ? (
+          <>
+            <span className="user-notification-username">{userName}</span>
+            <span className="user-notification-email">{email}</span>
+            <span className="user-notification-message">{message}</span>
+          </>
+        ) : (
+          <span className="user-notification-message">{message}</span>
+        )}
+      </div>
 
-      {/* Friend Request Actions */}
-      {notification.type === "friend_request" && (
-        <div className="notification-actions">
-          <button onClick={() => onAccept?.(senderId, notification._id)}>✅ Accept</button>
-          <button onClick={() => onDecline?.(senderId)}>❌ Decline</button>
+      {/* Actions */}
+      {notification.type === "friend_request" ? (
+        <div className="user-notification-actions">
+          <button className="accept" onClick={() => onAccept?.(senderId, notification._id)}>✅ Accept</button>
+          <button className="decline" onClick={() => onDecline?.(senderId)}>❌ Decline</button>
         </div>
-      )}
-
-      {/* Event/Task Actions */}
-      {(notification.type === "event" || notification.type === "task") && (
-        <div className="notification-actions">
-          <button onClick={() => onDismiss?.(notification._id)}>✖ Dismiss</button>
-          <button onClick={() => onSnooze?.(notification._id)}>⏳ Snooze</button>
+      ) : (notification.type === "event" || notification.type === "task") ? (
+        <div className="user-notification-actions">
+          <button className="dismiss" onClick={() => onDismiss?.(notification._id)}>✖</button>
+          <button className="snooze" onClick={() => onSnooze?.(notification._id)}>⏳</button>
         </div>
-      )}
+      ) : null}
     </li>
   );
 };
+
 
 const Topbar: React.FC = () => {
   const { user } = useAuth();

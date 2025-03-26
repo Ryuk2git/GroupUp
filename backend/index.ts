@@ -9,6 +9,7 @@ import friendsRoutes from './routes/friendsRoutes'
 import voiceChannelRoutes from './routes/voiceChannelRoutes';
 import notificationRoutes from './routes/notificationRoutes';
 import searchRoutes from './routes/serachRoutes'
+import driveRoutes from './routes/driveRoutes';
 
 import { initDB } from './config/db';
 import { apiLogger } from './middleware/apiLogger';
@@ -34,15 +35,16 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
-// Log Requests and Response
+// Log Requests and Response~~
 app.use(apiLogger);
 
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/friends', friendsRoutes);
-app.use('/api', voiceChannelRoutes);
+app.use('/api/voice-channels', voiceChannelRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/search', searchRoutes);
+app.use('/api/drive', driveRoutes);
 
 // Initialize databases and start the server
 initDB().then(() => {

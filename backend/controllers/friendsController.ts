@@ -17,10 +17,22 @@ export const getFriends = async (req: Request, res: Response): Promise<void> => 
 
   try {
     const result = await sequelize.query(
-      `SELECT f.friendId, u.userName, u.emailID, u.pfpRoute 
-      FROM friends f
-      LEFT JOIN users u ON f.friendId = u.userID
-      WHERE f.userId = :userId AND f.status = 'accepted'`,
+      `SELECT 
+          CASE 
+            WHEN f.userId = :userId THEN f.friendId 
+            ELSE f.userId 
+          END AS friendId, 
+          u.userName, 
+          u.emailID, 
+          u.pfpRoute 
+       FROM friends f
+       LEFT JOIN users u ON u.userID = 
+          CASE 
+            WHEN f.userId = :userId THEN f.friendId 
+            ELSE f.userId 
+          END
+       WHERE (f.userId = :userId OR f.friendId = :userId) 
+         AND f.status = 'accepted'`,
       {
         replacements: { userId },
         type: QueryTypes.SELECT,
@@ -163,12 +175,12 @@ export const approveFriendRequest = async (req: Request, res: Response) => {
       return;
     }
 
-    const { userId, friendId } = updatedFriendship[0];
+    const { friendId, userId } = updatedFriendship[0];
 
     const friendUserNameResult: any = await sequelize.query(
       `SELECT userName FROM users WHERE userID = ? LIMIT 1`,
       {
-        replacements: [friendId],
+        replacements: [userId],
         type: "SELECT",
       }
     );
@@ -180,7 +192,7 @@ export const approveFriendRequest = async (req: Request, res: Response) => {
     // Create a notification in MongoDB
     const newNotification = new NotificationModel({
       notificationId: notificationId,
-      userId: friendId,
+      userId: userId,
       userName: friendUserName,
       type: NotificationType.FRIEND_REQUEST_ACCEPTED,
       content: { senderId: userId, message: "Your friend request was accepted." },

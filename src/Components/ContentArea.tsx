@@ -1,6 +1,7 @@
 import React from "react";
 import ChatArea from "../Components/chatArea";
 import { useChatVoice } from "../Context/ChatVoiceContext";
+import DriveArea from "./DriveArea";
 
 interface ContentAreaProps {
   activeSection: string;
@@ -32,6 +33,9 @@ const ContentArea: React.FC<ContentAreaProps> = ({ activeSection }) => {
 
       case "tasks":
         return <p>📌 Task List</p>;
+
+      case "files":
+        return <DriveArea />
 
       default:
         return <p>Welcome to GroupUp!</p>;

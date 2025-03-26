@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { GlobalProvider } from "../Context/GlobalProvider";
 import { ChatVoiceProvider } from "../Context/ChatVoiceContext";
 import { SelectionProvider } from "../Context/SelectionContext";
 import "../Styles/mainPageStyles.css";
@@ -16,29 +17,31 @@ const MainPage: React.FC<MainPageProps> = ({ section }) => {
   const [activeSection, setActiveSection] = useState(section);
 
   return (
-<SelectionProvider>
-    <ChatVoiceProvider>
-      <div className="main-page-container">
-        {/* Left Sidebar */}
-        <Sidebar setActiveSection={setActiveSection} />
+    <GlobalProvider>
+      <SelectionProvider>
+          <ChatVoiceProvider>
+            <div className="main-page-container">
+              {/* Left Sidebar */}
+              <Sidebar setActiveSection={setActiveSection} />
 
-        {/* Recent Friends & Files Section */}
-        <Contextpanel />
+              {/* Recent Friends & Files Section */}
+              <Contextpanel />
 
-        {/* Main Content Area */}
-        <div className="main-content-wrapper">
-          {/* Top Bar */}
-          <Topbar />
+              {/* Main Content Area */}
+              <div className="main-content-wrapper">
+                {/* Top Bar */}
+                <Topbar />
 
-          {/* Dynamic Content Area */}
-          <ContentArea activeSection={activeSection}/>
-        </div>
+                {/* Dynamic Content Area */}
+                <ContentArea activeSection={activeSection}/>
+              </div>
 
-        {/* Right Sidebar (Only Visible on Home) */}
-        {activeSection === "home" && <RightSidebar />}
-      </div>
-    </ChatVoiceProvider>
-    </SelectionProvider>
+              {/* Right Sidebar (Only Visible on Home) */}
+              {activeSection === "home" && <RightSidebar />}
+            </div>
+        </ChatVoiceProvider>
+      </SelectionProvider>
+    </GlobalProvider>
   );
 };
 

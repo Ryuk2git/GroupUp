@@ -490,50 +490,118 @@
     font-size: 14px;
   }
   
-  /* Mark As Read Button */
-  .user-notification-mark-read {
-    background: none;
-    border: none;
-    color: #4caf50;
-    font-size: 14px;
-    cursor: pointer;
-  }
-  
-  /* Delete Notification Button */
-  .user-notification-delete {
-    background: none;
-    border: none;
-    color: #ff4d4d;
-    font-size: 14px;
-    cursor: pointer;
-  }
-  
-  /* Unread Notifications - Bold Text */
-  .user-notification-unread {
-    font-weight: bold;
-    color: #fff;
-  }
-  
-  /* Notification Badge */
-  .user-notification-badge {
-    background: red;
-    color: white;
-    font-size: 12px;
-    font-weight: bold;
-    padding: 3px 7px;
-    border-radius: 50%;
-    position: absolute;
-    top: 5px;
-    right: 5px;
-  }
-  
-  /* Empty Notifications Message */
-  .user-notification-empty {
-    text-align: center;
-    padding: 15px;
-    font-size: 14px;
-    color: #aaa;
-  }
+/* Notification List */
+.user-notification-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* Notification Tile */
+.user-notification-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #222;
+  border-radius: 6px;
+  padding: 10px 12px;
+  margin-bottom: 6px;
+  transition: background 0.2s ease-in-out;
+  border-left: 3px solid transparent;
+}
+
+/* Hover Effect */
+.user-notification-item:hover {
+  background: #2b2b2b;
+}
+
+/* Read vs Unread */
+.user-notification-unread {
+  font-weight: bold;
+  color: #f1f1f1;
+  border-left-color: #4caf50;
+}
+
+.user-notification-read {
+  font-weight: normal;
+  color: #bbb;
+  border-left-color: transparent;
+}
+
+/* Notification Content */
+.user-notification-info {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.user-notification-message {
+  font-size: 13px;
+  color: #ddd;
+}
+
+.user-notification-username {
+  font-size: 14px;
+  font-weight: bold;
+  color: #fff;
+}
+
+.user-notification-email {
+  font-size: 12px;
+  color: #999;
+}
+
+/* Action Buttons */
+.user-notification-actions button {
+  background: #333;
+  border: none;
+  color: #ccc;
+  font-size: 12px;
+  padding: 5px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  margin-left: 4px;
+}
+
+/* Accept Button */
+.user-notification-actions .accept {
+  background: #4caf50;
+  color: white;
+}
+
+.user-notification-actions .accept:hover {
+  background: #45a049;
+}
+
+/* Decline Button */
+.user-notification-actions .decline {
+  background: #ff4d4d;
+  color: white;
+}
+
+.user-notification-actions .decline:hover {
+  background: #e63946;
+}
+
+/* Dismiss & Snooze */
+.user-notification-actions .dismiss {
+  background: #777;
+}
+
+.user-notification-actions .dismiss:hover {
+  background: #888;
+}
+
+.user-notification-actions .snooze {
+  background: #ff9800;
+  color: white;
+}
+
+.user-notification-actions .snooze:hover {
+  background: #e68900;
+}
+
   
   /* ===================================
      DYNAMIC CONTENT AREA

@@ -50,7 +50,7 @@ const ChatVoiceList: React.FC = () => {
               className={`main-recent-item ${selectedItem?.data?.friendId === friend.friendId ? "selected" : ""}`}
               onClick={() => handleChatSelect(friend)}
             >
-              <img src={friend.pfp || "/images/default-profile.jpg"} alt={friend.username} className="profile-pic" />
+              <img src={friend.pfp || "/images/default-profile.jpg"} className="profile-pic" />
               {friend.username}
             </div>
           ))

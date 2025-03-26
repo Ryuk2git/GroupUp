@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useAuth } from "../Context/AuthContext";
 import ChatVoiceList from "./ChatVoiceList";
+import DriveContextPanel from "./driveContextPanel";
 
 const ContextSection: React.FC = () => {
   const { logout } = useAuth();
@@ -135,13 +136,7 @@ const ContextSection: React.FC = () => {
 
       case "files":
         return (
-          <>
-            <button>➕ New File/Folder</button>
-            <h4>Drive</h4>
-            <div className="main-recent-item">📁 My Files</div>
-            <div className="main-recent-item">👥 Shared with Me</div>
-            <div className="main-recent-item">⏳ Recent</div>
-          </>
+          <DriveContextPanel />
         );
 
       default:

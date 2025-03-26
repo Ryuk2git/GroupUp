@@ -154,7 +154,7 @@ export const fetchSearchResults = async (query: string, category: string): Promi
         return []; // Return an empty array if the query is empty
       }
   
-      const response = await axios.get(`/api/search`, {
+      const response = await axios.get(`${API_URL}search`, {
         params: {
           q: query,
           type: category === "All" ? undefined : category.toLowerCase(),
@@ -166,5 +166,99 @@ export const fetchSearchResults = async (query: string, category: string): Promi
     }catch(error: any) {
       console.error("Error fetching search results:", error);
       return []; // Return an empty array in case of an error
+    }
+};
+
+// Drive API's
+
+export const fetchUserDriveData = async (userId: string): Promise<any> => {
+    if(!userId){
+        console.error("Missing USerId");
+        return;
+    }
+    try {
+        const response = await axios.get(`${API_URL}drive/content`, {
+            params: {userId}
+        });
+        console.log(response.data.content);
+        return response.data.content;
+    } catch (error) {
+        console.error("Error fetching user drive data:", error);
+        return [];
+    }
+};
+
+export const createFolder = async (userId: string, folderName: string): Promise<any> => {
+    if(!userId || !folderName){
+        console.error("Misisng User of Folder Name, error creating Folder");
+        return;
+    }
+    try {
+        const response = await axios.post(`${API_URL}drive/folder`, {userId, folderName});
+        console.log("Folder Created Successfully.");
+        return response.data;
+    } catch (error: any) {
+        console.error("Error Creating Folder: ", error);
+        throw error;
+    }
+};
+
+export const uploadFile = async (userId: string, file: File): Promise<any> => {
+    if (!userId || !file) {
+        console.error("UserId or file is missing, error uploading file");
+        return;
+    }
+    try {
+        const formData = new FormData();
+        formData.append("userId", userId);
+        formData.append("file", file);
+
+        const response = await axios.post(`${API_URL}drive/file`, formData, {
+            headers: {
+                "Content-Type": "multipart/form-data",
+            },
+        });
+        console.log("File uploaded successfully:", response.data);
+        return response.data;
+    } catch (error: any) {
+        console.error("Error uploading file:", error);
+        throw error;
+    }
+};
+
+export const uploadFolder = async (userId: string, folder: File[]): Promise<any> => {
+    if (!userId || !folder || folder.length === 0) {
+        console.error("❌ Missing userId or folder.");
+        return;
+    }
+
+    try {
+        const formData = new FormData();
+        formData.append("userId", userId);
+
+        const filePaths: string[] = [];
+
+        folder.forEach((file) => {
+            formData.append("files", file); // ✅ Match backend field name
+            const relativePath = file.webkitRelativePath || file.name; // ✅ Get relative path
+            filePaths.push(relativePath);
+        });
+
+        // Append file paths array
+        filePaths.forEach((path) => formData.append("filePaths[]", path));
+
+        const response = await axios.post(`${API_URL}drive/folder/upload`, formData, {
+            headers: { "Content-Type": "multipart/form-data" },
+            onUploadProgress: (progressEvent) => {
+                const percentCompleted = Math.round((progressEvent.loaded * 100) / (progressEvent.total ?? 1));
+                console.log(`📤 Upload progress: ${percentCompleted}%`);
+            },
+        });
+
+        console.log("✅ Folder uploaded successfully:", response.data);
+        return response.data;
+    } catch (error: any) {
+        console.error("❌ Error uploading folder:", error.response?.data || error.message);
+        throw error;
     }
 };

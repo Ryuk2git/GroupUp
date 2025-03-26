@@ -88,9 +88,7 @@ const searchAll = async (query: string, currentUserId: string) => {
  */
 const searchChats = async (query: string, currentUserId: string, res: Response) => {
   try {
-    const users = await searchUsers(query, currentUserId, 10);
-    console.log("Users: ", users);
-    return res.json(users);
+    return await searchUsers(query, currentUserId, 10); 
   } catch (error) {
     console.error("Error searching chats:", error);
     return res.status(500).json({ message: "Chat search failed" });
