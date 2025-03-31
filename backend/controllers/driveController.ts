@@ -10,6 +10,7 @@ import { v4 as uuidv4 } from "uuid";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+const BASE_STORAGE_PATH = path.join(__dirname, "../../storage");
 
 // Extend the Request interface to include file and files properties
 declare global {
@@ -39,7 +40,6 @@ const getDriveContent = (directoryPath: string): any[] => {
     });
   };
   
-  const BASE_STORAGE_PATH = path.join(__dirname, "../../storage");
 
 export const fetchDriveContent = async (req: Request, res: Response) => {
   try {
@@ -61,8 +61,13 @@ export const fetchDriveContent = async (req: Request, res: Response) => {
     // Fetch drive content (now recursive)
     const driveContent = getDriveContent(userDrivePath);
 
-    // Process the drive content to remove IDs from names
-    const processedContent = driveContent.map((item) => processItemName(item));
+    // Process only folders to remove IDs from names
+    const processedContent = driveContent.map((item) => {
+      if (item.isFolder) {
+        return processItemName(item); // Apply processItemName only to folders
+      }
+      return item; // Return files as is
+    });
 
     res.status(200).json({
       message: "Drive content retrieved successfully.",
@@ -257,7 +262,7 @@ export const uploadFile = async (req: Request, res: Response) => {
             version_history: [{ version: 1, updatedBy: userId, timestamp: uploadedAt }],
             comments: [],
         });
-
+        console.log("File Name is: ",req.file.originalname);
         res.status(201).json({
             message: "File uploaded successfully",
             file: { fileID, filePath, fileName: req.file.originalname },

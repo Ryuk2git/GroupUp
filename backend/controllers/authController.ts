@@ -5,8 +5,11 @@ import User from '../models/users';
 import jwt from 'jsonwebtoken';
 import fs from "fs";
 import path from "path";
+import { fileURLToPath } from 'url';
 
 const JWT_SECRET = '9552535317';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const initializeUserStorage = (userID: string): void => {
   if (!userID) {

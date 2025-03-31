@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File & Folder Character & Line Counter</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            text-align: center;
+        }
+        input {
+            margin: 10px;
+        }
+        table {
+            width: 80%;
+            margin: auto;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>File & Folder Character & Line Counter</h2>
+    <input type="file" id="fileInput" webkitdirectory directory multiple>
+    <table>
+        <thead>
+            <tr>
+                <th>File Name</th>
+                <th>Lines</th>
+                <th>Characters</th>
+            </tr>
+        </thead>
+        <tbody id="fileStats"></tbody>
+    </table>
+    <h3 id="totalStats">Total Lines: 0, Total Characters: 0</h3>
+
+    <script>
+        let totalLines = 0, totalChars = 0; // Cumulative totals
+
+        document.getElementById("fileInput").addEventListener("change", async (event) => {
+            const files = Array.from(event.target.files);
+            const validExtensions = [".js", ".jsx", ".ts", ".tsx"];
+            const filteredFiles = files.filter(file => validExtensions.some(ext => file.name.endsWith(ext)));
+
+            const tableBody = document.getElementById("fileStats");
+            const totalStats = document.getElementById("totalStats");
+
+            for (const file of filteredFiles) {
+                const content = await file.text();
+                const numLines = content.split("\n").length;
+                const numChars = content.length;
+
+                totalLines += numLines;
+                totalChars += numChars;
+
+                tableBody.innerHTML += `<tr>
+                    <td>${file.webkitRelativePath}</td>
+                    <td>${numLines}</td>
+                    <td>${numChars}</td>
+                </tr>`;
+            }
+
+            totalStats.innerText = `Total Lines: ${totalLines}, Total Characters: ${totalChars}`;
+        });
+    </script>
+
+</body>
+</html>

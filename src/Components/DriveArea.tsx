@@ -22,63 +22,51 @@ const DriveArea: React.FC = () => {
 const DriveHome: React.FC = () => {
     return (
         <div className="drive-container">
-            {/* Top Section Container */}
-            <div className="drive-top-section">
-                {/* Categories & Storage */}
-                <section className="drive-categories-section">
-                    <h1 className="drive-main-heading">Categories</h1>
-                    <button className="drive-add-files-btn">
-                        Add new files
-                    </button>
-                    
-                    <div className="drive-storage-info">
-                        <div className="drive-storage-header">
-                            <span className="drive-storage-label">Your storage</span>
-                            <span className="drive-storage-left">25% left</span>
-                        </div>
-                        <div className="drive-progress-bar">
-                            <div className="drive-progress-fill" style={{ width: '75%' }}></div>
-                        </div>
-                        <div className="drive-storage-details">
-                            75 GB of 100 GB are used
-                        </div>
-                    </div>
-                </section>
+        <div className="drive-main">
+          <div className="drive-filters">
+            <button className="drive-filter">People</button>
+            <button className="drive-filter">Modified</button>
+            <button className="drive-filter">Type</button>
+          </div>
+  
+          <h2 className="drive-title">Categories</h2>
+          <div className="drive-categories">
+            <div className="drive-category">Documents</div>
+            <div className="drive-category">Images</div>
+            <div className="drive-category">Videos</div>
+            <div className="drive-category">Audio</div>
+          </div>
+  
+          <h3 className="drive-subtitle">Recent Files</h3>
+          <div className="drive-recent-files">
+            <Tile type="file" name="Report.pdf" owner="John Doe" modified="Mar 25" size="2MB" />
+            <Tile type="file" name="Presentation.pptx" owner="Jane Smith" modified="Mar 26" size="5MB" />
+          </div>
+  
+          <h3 className="drive-subtitle">Recent Folders</h3>
+          <div className="drive-recent-folders">
+            <Tile type="folder" name="Project Docs" owner="-" modified="Mar 24" size="-" />
+            <Tile type="folder" name="Design Assets" owner="-" modified="Mar 23" size="-" />
+            <Tile type="folder" name="Design Assets" owner="-" modified="Mar 23" size="-" />
+            <Tile type="folder" name="Design Assets" owner="-" modified="Mar 23" size="-" />
 
-                {/* Recent Files */}
-                <section className="drive-recent-section">
-                    <h2 className="drive-section-heading">Recent files</h2>
-                    <div className="drive-files-table">
-                        <div className="drive-table-header">
-                            <div className="drive-col-type">File Type</div>
-                            <div className="drive-col-size">Size</div>
-                            <div className="drive-col-shared">Shared Folders</div>
-                        </div>
-                        <div className="drive-table-row">
-                            <div className="drive-col-type">PNG file</div>
-                            <div className="drive-col-size">5 MB</div>
-                            <div className="drive-col-shared">Your shared folders</div>
-                        </div>
-                        <div className="drive-table-row">
-                            <div className="drive-col-type">AVI file</div>
-                            <div className="drive-col-size">105 MB</div>
-                            <div className="drive-col-shared">Design files</div>
-                        </div>
-                        <div className="drive-table-row">
-                            <div className="drive-col-type">MP3 file</div>
-                            <div className="drive-col-size">21 MB</div>
-                            <div className="drive-col-shared">Sumer photos</div>
-                        </div>
-                        <div className="drive-table-row">
-                            <div className="drive-col-type">DOCx file</div>
-                            <div className="drive-col-size">500 kb</div>
-                            <div className="drive-col-shared">Project report</div>
-                        </div>
-                    </div>
-                    <button className="drive-add-more-btn">Add more</button>
-                </section>
-            </div>
+          </div>
         </div>
+  
+        <div className="drive-sidebar">
+          <div className="drive-shared">
+            <h3>Your Shared Files</h3>
+            <div className="drive-shared-file">
+              <span>File Name 1</span>
+              <div className="drive-shared-icons"></div>
+            </div>
+            <div className="drive-shared-file">
+              <span>File Name 2</span>
+              <div className="drive-shared-icons"></div>
+            </div>
+          </div>
+        </div>
+      </div>
     );
 };
 
@@ -86,22 +74,80 @@ const DriveHome: React.FC = () => {
 const MyDrive: React.FC = () => {
     const { user } = useAuth();
     const currentUserId = user?.userID;
-    const [files, setFiles] = useState<{ name: string; type: string }[]>([]);
-    
+    const [files, setFiles] = useState<{ name: string; size: string | null; createdAt: string }[]>([]);
+    const [folders, setFolders] = useState<{ name: string; size: string | null; createdAt: string }[]>([]);
+
     useEffect(() => {
         const loadDriveData = async () => {
             if (!currentUserId) return;
-            const content = await fetchUserDriveData(currentUserId);
-            setFiles(content || []);
+
+            try {
+                const response = await fetchUserDriveData(currentUserId);
+
+                // Separate files and folders based on `isFolder` property
+                const fetchedFolders = response.filter((item: any) => item.isFolder);
+                const fetchedFiles = response.filter((item: any) => !item.isFolder);
+
+                setFolders(fetchedFolders || []);
+                setFiles(fetchedFiles || []);
+                console.log("Files:", fetchedFiles);
+                
+            } catch (error) {
+                console.error("Error loading drive data:", error);
+            }
         };
 
         loadDriveData();
     }, [currentUserId]);
 
     return (
-        <div className="my-drive">
-            <h2>My Drive</h2>
-            <FileGrid files={files}/>
+        <div className="drive-container">
+            <div className="drive-main">
+                {/* Filters */}
+                <div className="drive-filters">
+                    <button className="drive-filter">People</button>
+                    <button className="drive-filter">Modified</button>
+                    <button className="drive-filter">Type</button>
+                </div>
+
+                {/* Folders Section */}
+                <h3 className="drive-subtitle">Folders</h3>
+                <div className="drive-recent-folders">
+                    {folders.length > 0 ? (
+                        folders.map((folder, index) => (
+                            <Tile
+                                key={index}
+                                type="folder"
+                                name={folder.name}
+                                owner="-" // Replace with actual owner if available
+                                modified={new Date(folder.createdAt).toLocaleDateString()} // Format createdAt date
+                                size={folder.size || "-"} // Folders typically don't have a size
+                            />
+                        ))
+                    ) : (
+                        <p>No folders found</p>
+                    )}
+                </div>
+
+                {/* Files Section */}
+                <h3 className="drive-subtitle">Files</h3>
+                <div className="drive-recent-files">
+                    {files.length > 0 ? (
+                        files.map((file, index) => (
+                            <Tile
+                                key={index}
+                                type="file"
+                                name={file.name}
+                                owner="Me" // Replace with actual owner if available
+                                modified={new Date(file.createdAt).toLocaleDateString()} // Format createdAt date
+                                size={file.size || "Unknown"} // Replace with actual size if available
+                            />
+                        ))
+                    ) : (
+                        <p>No files found</p>
+                    )}
+                </div>
+            </div>
         </div>
     );
 };
@@ -166,6 +212,28 @@ const FileList: React.FC<{ files: { name: string; owner: string }[] }> = ({ file
         </ul>
     );
 };
+
+const Tile: React.FC<{ type: string; name: string; owner: string; modified: string; size: string }> = ({ type, name, owner, modified, size }) => {
+    return (
+      <div className={`drive-tile ${type === "folder" ? "drive-folder-tile" : "drive-file-tile"}`}>
+        <div className="drive-tile-left">
+          <span className={`drive-tile-icon ${type}`}></span>
+          <span className="drive-tile-name">{name}</span>
+        </div>
+        {type === "file" && (
+          <div className="drive-tile-center">
+            <span className="drive-tile-owner">{owner}</span>
+            <span className="drive-tile-modified">{modified}</span>
+          </div>
+        )}
+        <div className="drive-tile-right">
+          {type === "file" ? <span className="drive-tile-size">{size}</span> : null}
+          <span className="drive-tile-options">⋮</span>
+        </div>
+      </div>
+    );
+  };
+  
 
 
 export default DriveArea;

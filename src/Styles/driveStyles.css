@@ -156,151 +156,195 @@ h2 {
 }
 
 .drive-container {
-  height: 100vh;
-  background-color: #f8f9fa;
-  padding: 2rem;
-  font-family: 'Segoe UI', system-ui, sans-serif;
-}
-
-.drive-top-section {
   display: flex;
-  gap: 2rem;
-  height: 50vh;
-  max-width: 1200px;
-  margin: 0 auto;
 }
 
-.drive-categories-section {
-  flex: 1;
+.drive-main {
+  flex: 3;
+  padding: 20px;
+}
+
+.drive-filters {
   display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
+  justify-content: center;
+  gap: 10px;
 }
 
-.drive-recent-section {
-  flex: 2;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.drive-main-heading {
-  margin: 0;
-  color: #1a1a1a;
-  font-size: 1.8rem;
-  font-weight: 600;
-}
-
-.drive-section-heading {
-  margin: 0;
-  color: #2d3436;
-  font-size: 1.4rem;
-  font-weight: 500;
-}
-
-.drive-add-files-btn {
-  padding: 0.8rem 1.5rem;
-  background: #4a90e2;
-  color: white;
+.drive-filter {
+  background-color: var(--accent-yellow);
+  color: black;
   border: none;
-  border-radius: 4px;
+  padding: 10px 15px;
+  border-radius: 20px;
   cursor: pointer;
-  align-self: flex-start;
-  transition: background 0.2s ease;
+  width: 110px;
 }
 
-.drive-add-files-btn:hover {
-  background: #357abd;
+.drive-title {
+  margin: 15px 0px;
+  font-size: 24px;
+  font-weight: bold;
 }
 
-.drive-storage-info {
-  background: rgba(255, 255, 255, 0.95);
-  padding: 1.2rem;
-  border-radius: 8px;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+.drive-categories {
+  display: flex;
+  gap: 15px;
+  margin-top: 10px;
 }
 
-.drive-storage-header {
+.drive-category {
+  background-color: var(--medium-gray);
+  color: var(--accent-white);
+  padding: 40px;
+  flex: 1;
+  border-radius: 10px;
+  text-align: center;
+  font-size: 18px;
+}
+
+.drive-subtitle {
+  font-size: 18px;
+  font-weight: bold;
+  margin-top: 20px;
+}
+
+.drive-recent-files{
+  /* background-color: var(--medium-gray); */
+  height: auto;
+  margin-top: 10px;
+  border-radius: 5px;
+}
+.drive-recent-folders{
+  height: auto;
+  margin-top: 10px;
+  border-radius: 5px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  column-gap: 15px;
+}
+
+.drive-sidebar {
+  flex: 1;
+  height: 90vh;
+  background-color: var(--darker-gray);
+  padding: 20px;
+  border-radius: 20px;
+}
+
+.drive-shared {
+  background-color: var(--medium-gray);
+  padding: 15px;
+  border-radius: 10px;
+}
+
+.drive-shared-file {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 0.8rem;
-  font-size: 0.95rem;
+  background-color: var(--darker-gray);
+  margin-top: 10px;
+  padding: 10px;
+  border-radius: 5px;
 }
 
-.drive-storage-left {
-  color: #27ae60;
-  font-weight: 600;
+.drive-shared-icons {
+  width: 30px;
+  height: 30px;
+  background-color: var(--accent-yellow);
+  border-radius: 50%;
 }
 
-.drive-progress-bar {
-  height: 6px;
-  background: #e0e0e0;
-  border-radius: 3px;
-  overflow: hidden;
+/* Tile */
+/* Tile container */
+.drive-tile {
+  display: flex;
+  align-items: center;
+  /* background-color: #222; */
+  color: white;
+  padding: 12px 16px;
+  border-radius: 10px;
+  gap: 10px;
+  width: 350px;
+  justify-content: space-between;
+  margin: 5px 0px;
+  transition: background 0.2s ease-in-out;
 }
 
-.drive-progress-fill {
-  height: 100%;
-  background: linear-gradient(90deg, #4a90e2, #6aa8ff);
-  transition: width 0.3s ease;
+/* Folder and file specific styles */
+.drive-folder-tile {
+  background-color: var(--medium-gray);
+  display: flex; 
+  width: 270px;
 }
 
-.drive-storage-details {
-  font-size: 0.9rem;
-  color: #666;
-  margin-top: 0.8rem;
-  text-align: center;
+.drive-file-tile {
+  background-color: var(--medium-gray);
+  width: 100%;
+  display: flex;
+  align-items: center;
+  padding: 10px;
 }
 
-.drive-files-table {
-  flex-grow: 1;
-  background: rgba(255, 255, 255, 0.95);
-  border-radius: 8px;
-  padding: 1rem;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+/* Hover effect */
+.drive-tile:hover {
+  background-color: var(--darker-gray);
 }
 
-.drive-table-header {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1.5fr;
-  padding: 0.8rem 0;
-  border-bottom: 2px solid #f0f0f0;
-  font-weight: 600;
-  color: #2d3436;
+/* Left section: icon + name */
+.drive-tile-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
-.drive-table-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1.5fr;
-  padding: 0.8rem 0;
-  border-bottom: 1px solid #f5f5f5;
+.drive-tile-icon {
+  width: 24px;
+  height: 24px;
+  display: inline-block;
 }
 
-.drive-col-type {
-  padding-left: 0.5rem;
+/* Folder and file icon styling */
+.drive-tile-icon.folder {
+  background: url('/folder-icon.svg') no-repeat center center;
+  background-size: contain;
 }
 
-.drive-col-size {
-  text-align: center;
+.drive-tile-icon.file {
+  background: url('/file-icon.svg') no-repeat center center;
+  background-size: contain;
 }
 
-.drive-col-shared {
-  padding-right: 0.5rem;
-  text-align: right;
-  color: #4a90e2;
+.drive-tile-name {
+  font-weight: bold;
 }
 
-.drive-add-more-btn {
-  background: none;
-  border: none;
-  color: #4a90e2;
+/* Center section: Only for files */
+.drive-tile-center {
+  display: flex;
+  flex-direction: column;
+  font-size: 12px;
+  color: #bbb;
+}
+
+.drive-tile-owner,
+.drive-tile-modified {
+  display: block;
+}
+
+/* Right section: file size + options */
+.drive-tile-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.drive-tile-size {
+  font-size: 12px;
+  color: #ddd;
+}
+
+.drive-tile-options {
   cursor: pointer;
-  padding: 0.8rem 0;
-  font-weight: 500;
-  align-self: flex-start;
-  transition: opacity 0.2s ease;
-}
-
-.drive-add-more-btn:hover {
-  opacity: 0.8;
+  font-size: 16px;
+  padding: 5px;
 }
