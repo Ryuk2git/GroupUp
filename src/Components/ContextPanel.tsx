@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useAuth } from "../Context/AuthContext";
 import ChatVoiceList from "./ChatVoiceList";
-import DriveContextPanel from "./driveContextPanel";
+import DriveContextPanel from "./DriveContextPanel";
 
 const ContextSection: React.FC = () => {
   const { logout } = useAuth();

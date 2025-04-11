@@ -259,51 +259,47 @@ h2 {
 .drive-tile {
   display: flex;
   align-items: center;
-  /* background-color: #222; */
   color: white;
   padding: 12px 16px;
   border-radius: 10px;
   gap: 10px;
-  width: 350px;
   justify-content: space-between;
   margin: 5px 0px;
   transition: background 0.2s ease-in-out;
+  position: relative;
 }
 
 /* Folder and file specific styles */
 .drive-folder-tile {
   background-color: var(--medium-gray);
-  display: flex; 
   width: 270px;
 }
 
 .drive-file-tile {
   background-color: var(--medium-gray);
   width: 100%;
-  display: flex;
-  align-items: center;
   padding: 10px;
 }
 
-/* Hover effect */
 .drive-tile:hover {
   background-color: var(--darker-gray);
 }
 
-/* Left section: icon + name */
+/* Left section */
 .drive-tile-left {
   display: flex;
   align-items: center;
   gap: 10px;
+  flex: 1 1 30%;
+  min-width: 0;
 }
 
 .drive-tile-icon {
   width: 24px;
   height: 24px;
-  display: inline-block;
+  flex-shrink: 0;
 }
 
-/* Folder and file icon styling */
 .drive-tile-icon.folder {
   background: url('/folder-icon.svg') no-repeat center center;
   background-size: contain;
@@ -316,35 +312,105 @@ h2 {
 
 .drive-tile-name {
   font-weight: bold;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 150px;
 }
 
-/* Center section: Only for files */
+/* Center section */
 .drive-tile-center {
   display: flex;
-  flex-direction: column;
+  gap: 16px;
   font-size: 12px;
   color: #bbb;
+  flex: 1;
+  min-width: 0;
+  transition: none !important;
+  opacity: 1 !important;
 }
 
-.drive-tile-owner,
-.drive-tile-modified {
-  display: block;
+.default-content {
+  display: flex;
+  gap: 16px;
+  font-size: 12px;
+  color: #bbb;
+  transition: opacity 0.2s;
 }
 
-/* Right section: file size + options */
+.hover-actions {
+  display: none;
+  gap: 8px;
+  align-items: center;
+  position: absolute;
+  right: 40px; /* Account for options button width */
+  background: var(--medium-gray);
+  padding: 4px;
+  border-radius: 4px
+}
+
+.drive-tile:hover .default-content {
+  opacity: 0;
+}
+
+.drive-tile:hover .hover-actions {
+  display: flex;
+}
+
+.drive-tile:hover .drive-tile-right {
+  gap: 12px;
+}
+
+/* Right section */
 .drive-tile-right {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
+  position: relative;
+  flex-shrink: 0;
 }
 
 .drive-tile-size {
   font-size: 12px;
+  margin-right: 8px;
   color: #ddd;
 }
 
 .drive-tile-options {
+  background: none;
+  border: none;
+  color: white;
+  padding: 4px;
   cursor: pointer;
-  font-size: 16px;
-  padding: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  position: relative;
+  z-index: 1;
+  background: transparent;
+  transition: background 0.2s;
+}
+
+.drive-tile-options:hover {
+  background: #444;
+}
+
+/* Hover buttons */
+.share-button, .download-button {
+  padding: 4px 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  background: #444;
+  color: white;
+  transition: background 0.2s;
+  font-size: 12px;
+}
+
+.share-button:hover, .download-button:hover {
+  background: var(--accent-yellow);
+  color: black;
 }

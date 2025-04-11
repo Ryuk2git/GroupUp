@@ -24,7 +24,8 @@ export const getFriends = async (req: Request, res: Response): Promise<void> => 
           END AS friendId, 
           u.userName, 
           u.emailID, 
-          u.pfpRoute 
+          u.pfpRoute, 
+          f.chatId
        FROM friends f
        LEFT JOIN users u ON u.userID = 
           CASE 
@@ -48,6 +49,7 @@ export const getFriends = async (req: Request, res: Response): Promise<void> => 
 
     const formattedFriends = friends.map((friend: any) => ({
       userId: friend.friendId,
+      chatId:friend.chatId,
       username: friend.userName ?? "Unknown",
       email: friend.emailID ?? "Unknown",
       pfp: friend.pfpRoute ?? "Unknown",

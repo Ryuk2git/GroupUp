@@ -262,3 +262,30 @@ export const uploadFolder = async (userId: string, folder: File[]): Promise<any>
         throw error;
     }
 };
+
+// MESSAGES
+// Fetch messages
+export const fetchMessages = async (chatId: string) => {
+    try {
+        const response = await axios.get(`${API_URL}messages/${chatId}`);
+        return response.data; 
+    } catch (error: any) {
+        console.error("Error fetching messages:", error);
+        throw error;
+    }
+};
+
+// Send New Message
+export const sendMessage = async (chatId: string, messageData: any) => {
+    try {
+        const response = await axios.post(`${API_URL}messages/${chatId}`, messageData, {
+            headers: {
+                "Content-Type": "application/json",
+            },
+        });
+        return response.data; 
+    } catch (error: any) {
+        console.error("Error sending message:", error);
+        throw error;
+    }
+};

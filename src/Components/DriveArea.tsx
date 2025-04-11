@@ -74,7 +74,7 @@ const DriveHome: React.FC = () => {
 const MyDrive: React.FC = () => {
     const { user } = useAuth();
     const currentUserId = user?.userID;
-    const [files, setFiles] = useState<{ name: string; size: string | null; createdAt: string }[]>([]);
+    const [files, setFiles] = useState<{ name: string; owner: string; size: string | null; createdAt: string }[]>([]);
     const [folders, setFolders] = useState<{ name: string; size: string | null; createdAt: string }[]>([]);
 
     useEffect(() => {
@@ -89,9 +89,14 @@ const MyDrive: React.FC = () => {
                 const fetchedFiles = response.filter((item: any) => !item.isFolder);
 
                 setFolders(fetchedFolders || []);
-                setFiles(fetchedFiles || []);
-                console.log("Files:", fetchedFiles);
-                
+                setFiles(
+                    fetchedFiles.map((file: any) => ({
+                        name: file.name,
+                        owner: "Me", // Replace with actual owner if available
+                        size: file.size,
+                        createdAt: file.createdAt,
+                    }))
+                );
             } catch (error) {
                 console.error("Error loading drive data:", error);
             }
@@ -112,41 +117,11 @@ const MyDrive: React.FC = () => {
 
                 {/* Folders Section */}
                 <h3 className="drive-subtitle">Folders</h3>
-                <div className="drive-recent-folders">
-                    {folders.length > 0 ? (
-                        folders.map((folder, index) => (
-                            <Tile
-                                key={index}
-                                type="folder"
-                                name={folder.name}
-                                owner="-" // Replace with actual owner if available
-                                modified={new Date(folder.createdAt).toLocaleDateString()} // Format createdAt date
-                                size={folder.size || "-"} // Folders typically don't have a size
-                            />
-                        ))
-                    ) : (
-                        <p>No folders found</p>
-                    )}
-                </div>
+                <FolderList folders={folders} />
 
                 {/* Files Section */}
                 <h3 className="drive-subtitle">Files</h3>
-                <div className="drive-recent-files">
-                    {files.length > 0 ? (
-                        files.map((file, index) => (
-                            <Tile
-                                key={index}
-                                type="file"
-                                name={file.name}
-                                owner="Me" // Replace with actual owner if available
-                                modified={new Date(file.createdAt).toLocaleDateString()} // Format createdAt date
-                                size={file.size || "Unknown"} // Replace with actual size if available
-                            />
-                        ))
-                    ) : (
-                        <p>No files found</p>
-                    )}
-                </div>
+                <FileList files={files} />
             </div>
         </div>
     );
@@ -156,7 +131,7 @@ const Shared: React.FC = () => {
     return (
         <div className="shared">
             <h2>Shared with Me</h2>
-            <FileList files={[{ name: "Team Presentation.pptx", owner: "John Doe" }]} />
+            
         </div>
     );
 };
@@ -165,7 +140,7 @@ const Starred: React.FC = () => {
     return (
         <div className="starred">
             <h2>Starred Files</h2>
-            <FileList files={[{ name: "Important Report.pdf", owner: "Me" }]} />
+            
         </div>
     );
 };
@@ -174,7 +149,7 @@ const Trash: React.FC = () => {
     return (
         <div className="trash">
             <h2>Trash</h2>
-            <FileList files={[{ name: "Old Project.zip", owner: "Me" }]} />
+            
         </div>
     );
 };
@@ -201,15 +176,45 @@ const FileGrid: React.FC<{ files: { name: string; type: string }[] }> = ({ files
     );
 };
 
-const FileList: React.FC<{ files: { name: string; owner: string }[] }> = ({ files }) => {
+const FolderList: React.FC<{ folders: { name: string; size: string | null; createdAt: string }[] }> = ({ folders }) => {
     return (
-        <ul className="file-list">
-            {files.map((file, index) => (
-                <li key={index}>
-                    📄 {file.name} <span className="owner">({file.owner})</span>
-                </li>
-            ))}
-        </ul>
+        <div className="drive-recent-folders">
+            {folders.length > 0 ? (
+                folders.map((folder, index) => (
+                    <Tile
+                        key={index}
+                        type="folder"
+                        name={folder.name}
+                        owner="-" // Replace with actual owner if available
+                        modified={new Date(folder.createdAt).toLocaleDateString()} // Format createdAt date
+                        size={folder.size || "-"} // Folders typically don't have a size
+                    />
+                ))
+            ) : (
+                <p>No folders found</p>
+            )}
+        </div>
+    );
+};
+
+const FileList: React.FC<{ files: { name: string; owner: string; size: string | null; createdAt: string }[] }> = ({ files }) => {
+    return (
+        <div className="drive-recent-files">
+            {files.length > 0 ? (
+                files.map((file, index) => (
+                    <Tile
+                        key={index}
+                        type="file"
+                        name={file.name}
+                        owner={file.owner} // Display the owner
+                        modified={new Date(file.createdAt).toLocaleDateString()} // Format createdAt date
+                        size={file.size || "Unknown"} // Replace with actual size if available
+                    />
+                ))
+            ) : (
+                <p>No files found</p>
+            )}
+        </div>
     );
 };
 
@@ -221,19 +226,24 @@ const Tile: React.FC<{ type: string; name: string; owner: string; modified: stri
           <span className="drive-tile-name">{name}</span>
         </div>
         {type === "file" && (
-          <div className="drive-tile-center">
-            <span className="drive-tile-owner">{owner}</span>
-            <span className="drive-tile-modified">{modified}</span>
-          </div>
+          <>
+            <div className="drive-tile-center">
+              <span className="drive-tile-owner">{owner}</span>
+              <span className="drive-tile-modified">{modified}</span>
+              <span className="drive-tile-size">{size}</span>
+            </div>
+            <div className="drive-tile-right">
+              <div className="hover-actions">
+                <button className="share-button">Share</button>
+                <button className="download-button">Download</button>
+              </div>
+              <button className="drive-tile-options">⋮</button>
+            </div>
+          </>
         )}
-        <div className="drive-tile-right">
-          {type === "file" ? <span className="drive-tile-size">{size}</span> : null}
-          <span className="drive-tile-options">⋮</span>
-        </div>
       </div>
     );
   };
-  
 
 
 export default DriveArea;

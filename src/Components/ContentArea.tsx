@@ -2,13 +2,14 @@ import React from "react";
 import ChatArea from "../Components/chatArea";
 import { useChatVoice } from "../Context/ChatVoiceContext";
 import DriveArea from "./DriveArea";
+import { useGlobalContext } from "../Context/GlobalProvider";
 
 interface ContentAreaProps {
   activeSection: string;
 }
 
 const ContentArea: React.FC<ContentAreaProps> = ({ activeSection }) => {
-  const { selectUser } = useChatVoice();
+  const { selectedChat } = useGlobalContext();
 
   const renderContent = () => {
     switch (activeSection) {
@@ -22,7 +23,7 @@ const ContentArea: React.FC<ContentAreaProps> = ({ activeSection }) => {
         );
 
       case "direct-message":
-        return selectUser ? (
+        return selectedChat ? (
           <ChatArea />
         ) : (
           <p>🔍 Select a chat to start messaging</p>

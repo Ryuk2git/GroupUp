@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
-import { useSelectionContext } from "../Context/SelectionContext";
 import { getFriends, getVoiceChannels } from "../Context/api";
+import { useGlobalContext } from "../Context/GlobalProvider";
 
 const ChatVoiceList: React.FC = () => {
-  const { selectedItem, setSelectedItem } = useSelectionContext();
-  const [friends, setFriends] = useState<{ friendId: string; username: string; email: string; pfp: string }[]>([]);
+  const { selectedChat, setSelectedChat } = useGlobalContext();
+  const [friends, setFriends] = useState<{ chatId: string, friendId: string; username: string; email: string; pfp: string }[]>([]);
   const [voiceChannels, setVoiceChannels] = useState<{ id: string; name: string }[]>([]);
 
   // Fetch Friends & Voice Channels
@@ -30,10 +30,24 @@ const ChatVoiceList: React.FC = () => {
     fetchData();
   }, []);
 
+  // Handle ESC key to clear selected chat
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setSelectedChat(null);
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [setSelectedChat]);
+
   // Handle Friend Selection
-  const handleChatSelect = (friend: { friendId: string; username: string; email: string; pfp: string }) => {
-    setSelectedItem({ type: "direct-message", data: friend });
-  };
+  // const handleChatSelect = (friend: { friendId: string; username: string; email: string; pfp: string }) => {
+  //   selectedChat({ type: "direct-message", data: friend });
+  // };
 
   return (
     <>
@@ -47,8 +61,8 @@ const ChatVoiceList: React.FC = () => {
           friends.map((friend) => (
             <div
               key={friend.friendId}
-              className={`main-recent-item ${selectedItem?.data?.friendId === friend.friendId ? "selected" : ""}`}
-              onClick={() => handleChatSelect(friend)}
+              className={`main-recent-item ${selectedChat?.friendId === friend.friendId ? "selected" : ""}`}
+              onClick={() => setSelectedChat(friend)}
             >
               <img src={friend.pfp || "/images/default-profile.jpg"} className="profile-pic" />
               {friend.username}
