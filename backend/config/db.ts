@@ -1,6 +1,9 @@
 import { Sequelize } from "sequelize";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
+import path from "path";
+import fs from "fs";
+import mysql from "mysql2/promise";
 
 dotenv.config();
 
@@ -41,10 +44,48 @@ const connectMySQL = async (): Promise<void> => {
   }
 };
 
+// Ensure schema exists (run database.sql if needed)
+const ensureMySQLSchema = async () => {
+  const DB_HOST ='localhost';
+  const DB_USER = 'root';
+  const DB_PASSWORD = 'Rishi';
+  const DB_NAME = 'groupproxy';
+
+  const connection = await mysql.createConnection({
+    host: DB_HOST,
+    user: DB_USER,
+    password: DB_PASSWORD,
+    multipleStatements: true,
+  });
+
+  // Check if the database exists
+  const [databases] = await connection.query("SHOW DATABASES LIKE ?", [DB_NAME]);
+  if ((databases as any[]).length === 0) {
+    // Run the schema file to create the database and tables
+    const schemaPath = path.join(__dirname, '../database.sql');
+    const schema = fs.readFileSync(schemaPath, 'utf8');
+    await connection.query(schema);
+    console.log('✅ Database schema created from database.sql');
+  } else {
+    // Use the database and check for a core table (e.g., users)
+    await connection.query(`USE \`${DB_NAME}\``);
+    const [tables] = await connection.query("SHOW TABLES LIKE 'users'");
+    if ((tables as any[]).length === 0) {
+      const schemaPath = path.join(__dirname, '../database.sql');
+      const schema = fs.readFileSync(schemaPath, 'utf8');
+      await connection.query(schema);
+      console.log('✅ Tables created from database.sql');
+    } else {
+      console.log('✅ Database and tables already exist');
+    }
+  }
+  await connection.end();
+};
+
 // Initialize all databases
 const initDB = async (): Promise<void> => {
   await connectMySQL();
   await connectMongoDB();
 };
 
-export { sequelize, connectMongoDB, initDB };
+export { sequelize, connectMongoDB, connectMySQL, ensureMySQLSchema, initDB };

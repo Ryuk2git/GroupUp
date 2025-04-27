@@ -3,6 +3,7 @@ import passport from 'passport';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import http from 'http';
+import fs from 'fs';
 import { Server } from 'socket.io';
 
 import authRoutes from './routes/authRoutes';
@@ -14,10 +15,11 @@ import driveRoutes from './routes/driveRoutes';
 import messageRoutes from './routes/messagesRoutes';
 import eventRoutes from './routes/eventRoutes';
 
-import { initDB } from './config/db';
+import { initDB, ensureMySQLSchema } from './config/db';
 import { startNotificationScheduler } from './middleware/notificaitonScheduler';
 import { apiLogger } from './middleware/apiLogger';
 import session from 'express-session';
+import path from 'path';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -86,11 +88,14 @@ app.use('/api/drive', driveRoutes);
 app.use('/api/messages', messageRoutes);
 app.use('/api/events', eventRoutes);
 
-// Initialize databases and start the server
-initDB().then(() => {
-    server.listen(PORT, () => {
+ensureMySQLSchema().then(() => {
+    initDB().then(() => {
+      server.listen(PORT, () => {
         console.log(`Server is running on http://localhost:${PORT}`);
+      });
+    }).catch((error) => {
+      console.error('Failed to initialize databases:', error);
     });
-}).catch((error) => {
-    console.error('Failed to initialize databases:', error);
-});
+  }).catch((error) => {
+    console.error('Failed to ensure schema:', error);
+  });

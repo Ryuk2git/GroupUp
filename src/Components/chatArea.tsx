@@ -20,7 +20,7 @@ interface Message {
     senderPic: string;
     text: string;
     messageType: "text" | "image" | "video" | "file"; // expand as needed
-    chatId: string;
+    chatId: string | null;
     groupId: string | null;
     reactions?: { emoji: string; userId: string }[]; // Optional reactions property
 }
@@ -43,6 +43,10 @@ const ChatArea: React.FC = () => {
     const chatId = selectedGroup ? selectedGroup.chatId : selectedChat?.chatId;
     const receiverId = selectedGroup?.groupId || selectedChat?.userId;
     const isGroup = !!selectedGroup;
+
+    useEffect(() => {
+        console.log("SelcetedGroup from chatArea: ", selectedGroup);
+    }, [selectedGroup]);
 
     useEffect(() => {
         console.log('ChatArea useEffect triggered with', { selectedChat, selectedGroup });
@@ -113,7 +117,11 @@ const ChatArea: React.FC = () => {
 
         try {
             socket.emit("sendMessage", messageData);
-            sendMessage(chatId, messageData);
+            if (chatId) {
+                sendMessage(chatId, messageData);
+            } else {
+                console.error("chatId is undefined");
+            }
             setNewMessage("");
         } catch (error) {
             console.error("Error sending message:", error);
