@@ -1,8 +1,8 @@
 import React from "react";
 import ChatArea from "../Components/chatArea";
-import { useChatVoice } from "../Context/ChatVoiceContext";
 import DriveArea from "./DriveArea";
 import { useGlobalContext } from "../Context/GlobalProvider";
+import EventsArea from "./EventsArea";
 
 interface ContentAreaProps {
   activeSection: string;
@@ -37,6 +37,9 @@ const ContentArea: React.FC<ContentAreaProps> = ({ activeSection }) => {
 
       case "files":
         return <DriveArea />
+
+      case "events":
+        return <EventsArea />;
 
       default:
         return <p>Welcome to GroupUp!</p>;

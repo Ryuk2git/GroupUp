@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useAuth } from "../Context/AuthContext";
 import ChatVoiceList from "./ChatVoiceList";
 import DriveContextPanel from "./DriveContextPanel";
+import EventContextPanel from "./EventContextPanel";
 
 const ContextSection: React.FC = () => {
   const { logout } = useAuth();
@@ -111,16 +112,7 @@ const ContextSection: React.FC = () => {
 
       case "events":
         return (
-          <>
-            <button>➕ Add Event</button>
-            <h4>Upcoming Events</h4>
-            <div className="main-recent-item">📅 Team Outing - March 12</div>
-            <div className="main-recent-item">📅 Client Meeting - March 15</div>
-
-            <h4>Categories</h4>
-            <div className="main-recent-item">🎯 Work</div>
-            <div className="main-recent-item">🎉 Personal</div>
-          </>
+          <EventContextPanel />
         );
 
       case "emails":

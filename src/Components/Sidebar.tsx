@@ -18,7 +18,7 @@ const navItems: NavItem[] = [
   { label: "Files", icon: "📁", section: "files" },
   { label: "Mail", icon: "📧", section: "emails" },
   { label: "Tasks", icon: "📌", section: "tasks" },
-  { label: "Calendar", icon: "📅", section: "calendar" },
+  { label: "Events", icon: "📅", section: "events" },
 ];
 
 const SidebarButton: React.FC<{ item: NavItem; isActive: boolean; onClick: () => void }> = ({ item, isActive, onClick }) => (

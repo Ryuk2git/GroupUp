@@ -1,28 +1,25 @@
 import { Router } from "express";
-import { sendMessage, getMessages, getChatDetails, addReaction, editMessage, deleteMessage } from "../controllers/messageController";
+import { sendMessage, getMessages, getChatDetails, addReaction, editMessage, deleteMessage, replyToMessage, forwardMessage, getGroups, createGroup } from "../controllers/messageController";
 
 const router = Router();
 
-// Send a new message
-router.post("/:chatId", sendMessage);
 
-// Fetch messages for a specific chat
+router.post("/:chatId", sendMessage);
+router.get("/groups", getGroups);
+router.post("/groups/create", createGroup);
+
 router.get("/:chatId", getMessages); 
 
-// Get chat details (e.g., last message)
 router.get("/chat-details", getChatDetails); 
 
-// Add a reaction to a message
-router.post("/reaction", addReaction);
+router.patch("/reaction/:messageId", addReaction);
 
-// Edit a message
-router.put("/edit", editMessage);
+router.patch("/edit/:messageId", editMessage);
 
-// Soft delete a message (for a specific user)
-router.put("/delete", deleteMessage);
+router.delete("/delete/:messageId", deleteMessage);
 
-// TODO: Implement message status update routes
-// - Mark as delivered
-// - Mark as read
+router.post("/reply/:chatId/:messageId", replyToMessage);
+
+router.post("/forward/:fromMessageId/:toChatId", forwardMessage); 
 
 export default router;

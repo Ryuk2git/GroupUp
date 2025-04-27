@@ -1,15 +1,19 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
+
 import { FaPhone, FaVideo, FaRegSmile, FaRegStar, FaReply, FaTrash, FaShare } from "react-icons/fa";
 import "../Styles/chatAreaStyles.css";
+import EmojiPicker from 'emoji-picker-react';
+// import "emoji-mart/css/emoji-mart.css";
+
 import { useGlobalContext } from "../Context/GlobalProvider";
-import { fetchMessages, sendMessage } from "../Context/api";
+import { fetchMessages, sendMessage, reactToMessage, starMessage, forwardMessage, deleteMessage } from "../Context/api";
 import { useAuth } from "../Context/AuthContext";
 import io from "socket.io-client";
 
 // Message Interface
 interface Message {
     createdAt: string | Date;
-    id: number;
+    _id?: string;
     senderName: string;
     senderId: string;     
     receiverId: string;    
@@ -17,8 +21,9 @@ interface Message {
     text: string;
     messageType: "text" | "image" | "video" | "file"; // expand as needed
     chatId: string;
-
-  }
+    groupId: string | null;
+    reactions?: { emoji: string; userId: string }[]; // Optional reactions property
+}
 
 const socket = io("http://localhost:3000", {
     transports: ["websocket", "polling"], // Ensure compatibility with different transport methods
@@ -29,18 +34,23 @@ const socket = io("http://localhost:3000", {
 const ChatArea: React.FC = () => {
     const [messages, setMessages] = useState<Message[]>([]);
     const [newMessage, setNewMessage] = useState<string>("");
-    const { selectedChat } = useGlobalContext();
+    const { selectedChat, selectedGroup } = useGlobalContext();
     const { user } = useAuth();
+    const currentUserId = user?.userID;
 
-    if (!selectedChat) return null;
+    if (!selectedChat && !selectedGroup) return null;
+
+    const chatId = selectedGroup ? selectedGroup.chatId : selectedChat?.chatId;
+    const receiverId = selectedGroup?.groupId || selectedChat?.userId;
+    const isGroup = !!selectedGroup;
 
     useEffect(() => {
+        console.log('ChatArea useEffect triggered with', { selectedChat, selectedGroup });
         const loadMessages = async () => {
-            if (selectedChat?.chatId) {
+            if (chatId && currentUserId) {
                 try {
-                    const data = await fetchMessages(selectedChat.chatId);
+                    const data: Message[] = await fetchMessages(chatId, currentUserId);
                     setMessages(data);
-                    console.log("Messages: ", data);
                 } catch (error) {
                     console.error("Error fetching messages:", error);
                 }
@@ -59,11 +69,26 @@ const ChatArea: React.FC = () => {
             setMessages((prevMessages) => [...prevMessages, message]);
         });
 
+        socket.on("messageReacted", ({ messageId, userId, emoji }: { messageId: string; userId: string; emoji: string }) => {
+            setMessages((prev) =>
+                prev.map((msg) =>
+                    msg._id === messageId
+                        ? {
+                              ...msg,
+                              reactions: updateReactions(msg.reactions || [], userId, emoji),
+                          }
+                        : msg
+                )
+            );
+        });
+
         // Cleanup on component unmount
         return () => {
             socket.off("receiveMessage");
+            socket.off("messageDeleted");
+            socket.off("messageReacted");
         };
-    }, [selectedChat]);
+    }, [selectedChat, selectedGroup, socket]);
 
     useEffect(() => {
         const chatMessagesContainer = document.querySelector('.chatArea-messages');
@@ -79,21 +104,17 @@ const ChatArea: React.FC = () => {
 
         const messageData = {
             senderId: currentUserId,
-            receiverId: selectedChat.userId, // error but works correctly TS_ERROR
+            receiverId,
             text: newMessage,
             messageType: "text",
-            chatId: selectedChat.chatId,
-            timestamp: new Date().toISOString(),
+            chatId,
+            createdAt: new Date().toISOString(),
         };
-        console.log(selectedChat);
-        console.log("Message Data: ", messageData);
 
         try {
-            // Emit the message to the server
             socket.emit("sendMessage", messageData);
-            sendMessage(selectedChat.chatId, messageData);
+            sendMessage(chatId, messageData);
             setNewMessage("");
-
         } catch (error) {
             console.error("Error sending message:", error);
         }
@@ -102,7 +123,7 @@ const ChatArea: React.FC = () => {
     return (
         <div className="chatArea-container">
             {/* Chat Header */}
-            {selectedChat && <ChatHeader />}
+            {selectedGroup ? <GroupChatHeader /> : selectedChat ? <ChatHeader /> : null}
 
             {/* Chat Messages Display */}
             <div className="chatArea-messages">
@@ -119,12 +140,13 @@ const ChatArea: React.FC = () => {
                     const isMine = msg.senderId === user?.userID;
 
                     return (
-                        <div key={msg.id || index}>
+                        <div key={msg._id || index}>
                             {showDateDivider && <DateDivider date={currentDate} />}
                             <ChatMessage
                                 message={msg}
                                 isSameSender={isSameSender}
                                 isMine={isMine}
+                                
                             />
                         </div>
                     );
@@ -136,6 +158,22 @@ const ChatArea: React.FC = () => {
         </div>
     );
 }
+
+const GroupChatHeader: React.FC = () => {
+    const { selectedGroup } = useGlobalContext();
+    if (!selectedGroup) return null;
+    return (
+        <div className="chatArea-header">
+            <div className="chatArea-userInfo">
+                <span className="chatArea-userName"># {selectedGroup.groupName || selectedGroup.name}</span>
+            </div>
+            <div className="chatArea-chatActions">
+                <FaPhone className="chatArea-icon" />
+                <FaVideo className="chatArea-icon" />
+            </div>
+        </div>
+    );
+};
 
 // Chat Header Component
 const ChatHeader: React.FC = () => {
@@ -157,8 +195,11 @@ const ChatHeader: React.FC = () => {
 }
 
 // Chat Message Component
-const ChatMessage: React.FC<{ message: Message; isSameSender: boolean; isMine: boolean }> = ({ message, isSameSender, isMine }) => {
+const ChatMessage: React.FC<{ message: Message; isSameSender: boolean; isMine: boolean; setReplyTarget?:(msg: Message) => void}> = ({ message, isSameSender, isMine, setReplyTarget }) => {
     const [showActions, setShowActions] = useState(false);
+    const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+    const emojiPickerRef = useRef<HTMLDivElement>(null);
+    const { user } = useAuth();
 
     const formatTime = (timestamp: string) => {
         const date = new Date(timestamp);
@@ -168,17 +209,90 @@ const ChatMessage: React.FC<{ message: Message; isSameSender: boolean; isMine: b
             hour12: true
         });
     };
+    // Toggle emoji picker
+    const toggleEmojiPicker = () => {
+        setShowEmojiPicker((prev) => !prev);
+    };
+
+    // Close on outside click
+    useEffect(() => {
+        const handleClickOutside = (e: MouseEvent) => {
+            if (emojiPickerRef.current && !emojiPickerRef.current.contains(e.target as Node)) {
+                setShowEmojiPicker(false);
+            }
+        };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
+
+    const handleReact = async (emoji: string) => {
+        try {
+            if (message._id && user?.userID) {
+                await reactToMessage(message._id, user.userID, emoji);
+                setShowEmojiPicker(false);
+                socket.emit("reactMessage", {
+                    messageId: message._id,
+                    userId: user.userID,
+                    emoji,
+                });
+            } else {
+                console.error("Message ID or User ID is undefined");
+            }
+            console.log("Reacted with:", emoji);
+        } catch (err) {
+            console.error("Error reacting:", err);
+        } finally {
+            setShowEmojiPicker(false);
+        }
+    };
+
+    const handleStar = async () => {
+        try {
+            if (message._id && user?.userID) {
+                await starMessage(message._id, user.userID);
+            } else {
+                console.error("Message ID or User ID is undefined");
+            }
+        } catch (err) {
+            console.error("Error starring message:", err);
+        }
+    };
+
+    const handleForward = async () => {
+        const toUserId = prompt("Enter recipient user/group ID:");
+        if (!toUserId) return;
+        try {
+            if (message._id) {
+                await forwardMessage(message._id, user?.userID || "", toUserId, false);
+            } else {
+                console.error("Message ID is undefined");
+            }
+        } catch (err) {
+            console.error("Error forwarding message:", err);
+        }
+    };
+
+    const handleReply = () => {
+        if (setReplyTarget) setReplyTarget(message);
+    };
+
+    const handleDeleteMessage = async () => {
+        try{
+            await deleteMessage((message._id ?? "").toString(), user?.userID ?? "");
+            await deleteMessage((message._id ?? "").toString(), user?.userID ?? "");
+        } catch (err) {
+            console.error("Error deleting message:", err);
+        }
+    };
 
     return (
-        <div 
+        <div
             className={`chatArea-message ${isMine ? "mine" : "theirs"} ${isSameSender ? "same-sender" : ""}`}
             onMouseEnter={() => setShowActions(true)}
             onMouseLeave={() => setShowActions(false)}
         >
-            {/* Only show header if not same sender */}
             {!isSameSender && (
                 <div className="chatArea-messageHeader">
-                    <img src={message.senderPic} alt="User" className="chatArea-messagePic" />
                     <span className="chatArea-messageSender">{message.senderName}</span>
                 </div>
             )}
@@ -186,7 +300,18 @@ const ChatMessage: React.FC<{ message: Message; isSameSender: boolean; isMine: b
             <div className="chatArea-messageContent">
                 <div className="chatArea-messageBubble">
                     <div className="chatArea-messageText">{message.text}</div>
-                    
+
+                    {/* Reactions under message bubble */}
+                    {message.reactions && message.reactions.length > 0 && (
+                        <div className="chatArea-reactions">
+                            {message.reactions.map((reaction, idx) => (
+                                <span key={idx} className="chatArea-reaction">
+                                    {reaction.emoji}
+                                </span>
+                            ))}
+                        </div>
+                    )}
+
                     {/* Timestamp on hover */}
                     {showActions && (
                         <div className="chatArea-messageMeta">
@@ -195,27 +320,45 @@ const ChatMessage: React.FC<{ message: Message; isSameSender: boolean; isMine: b
                     )}
                 </div>
 
-                {/* Message Actions */}
+                {/* Action Buttons */}
                 {showActions && (
                     <div className="chatArea-messageActions">
-                        <button className="chatArea-messageAction"><FaRegSmile size={16} /></button>
+                        <button className="chatArea-messageAction" onClick={toggleEmojiPicker}>
+                            <FaRegSmile size={16} />
+                        </button>
                         <button className="chatArea-messageAction"><FaRegStar size={16} /></button>
                         <button className="chatArea-messageAction"><FaShare size={16} /></button>
                         <button className="chatArea-messageAction"><FaReply size={16} /></button>
-                        <button className="chatArea-messageAction"><FaTrash size={16} /></button>
+                        <button className="chatArea-messageAction" onClick={handleDeleteMessage}>
+                            <FaTrash size={16} />
+                        </button>
+                    </div>
+                )}
+
+                {/* Emoji Picker Panel */}
+                {showEmojiPicker && (
+                    <div
+                        ref={emojiPickerRef}
+                        style={{
+                            position: "absolute",
+                            bottom: "45px",
+                            right: "10px",
+                            zIndex: 9999,
+                            backgroundColor: "#fff",
+                            borderRadius: "8px",
+                            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
+                        }}
+                    >
+                        <EmojiPicker onEmojiClick={(emojiData) => handleReact(emojiData.emoji)} />
                     </div>
                 )}
             </div>
         </div>
-    );
+    ); 
 };
 
 // Message Input Component
-const MessageInput: React.FC<{
-    newMessage: string;
-    setNewMessage: (msg: string) => void;
-    onSend: () => void;
-  }> = ({ newMessage, setNewMessage, onSend }) => {
+const MessageInput: React.FC<{ newMessage: string; setNewMessage: (msg: string) => void; onSend: () => void; }> = ({ newMessage, setNewMessage, onSend }) => {
     function handleKeyDown(event: React.KeyboardEvent<HTMLInputElement>): void {
       if (event.key === "Enter") {
         event.preventDefault();
@@ -272,6 +415,20 @@ const DateDivider: React.FC<{ date: string }> = ({ date }) => {
         </div>
     );
 };
+
+function updateReactions(reactions: { emoji: string; userId: string }[], userId: string, emoji: string) {
+    const existing = reactions.find(r => r.userId === userId);
+    if (existing) {
+        if (existing.emoji === emoji) {
+            // Toggle off if clicked again
+            return reactions.filter(r => !(r.userId === userId && r.emoji === emoji));
+        }
+        // Replace old emoji with new one
+        return reactions.map(r => r.userId === userId ? { ...r, emoji } : r);
+    }
+    // Add new reaction
+    return [...reactions, { userId, emoji }];
+}
 
 
 export default ChatArea;

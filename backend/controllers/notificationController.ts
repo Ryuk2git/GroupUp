@@ -3,29 +3,35 @@ import NotificationModel, { NotificationType } from "../models/notification";
 
 // Create a new notification
 export const createNotification = async (req: Request, res: Response) => {
-    try{
-        const { userId, userName, type, content, referenceId } = req.body;
+  try {
+    const { userId, userName, type, content } = req.body;
 
-        if (!userId || !userName || !type || !content) {
-            res.status(400).json({ error: "All fields are required" });
-            return;
-        }
+    if (!userId || !userName || !type || !content) {
+      res.status(400).json({ message: "Missing required fields." });
+      return;
+    }
 
-        const newNotification = new NotificationModel({
-        userId,
-        userName,
-        type,
-        content,
-        referenceId,
-        });
+    // Create and save the notification
+    const newNotification = new NotificationModel({
+      userId,
+      userName,
+      type,
+      content,
+    });
 
-        await newNotification.save();
-        res.status(201).json(newNotification);
-        return;
-    }catch(error: any){
-        res.status(500).json({ error: "Server Error", details: error });
-        return;
-   }
+    await newNotification.save();
+
+    // Emit real-time notification via socket
+    const io = req.app.get("io");
+    io.to(userId).emit("notification", newNotification);
+
+    res.status(201).json(newNotification);
+    return;
+  } catch (error) {
+    console.error("Error creating notification:", error);
+    res.status(500).json({ message: "Internal server error" });
+    return;
+  }
 };
 
 // Get notifications for a user (Paginated)

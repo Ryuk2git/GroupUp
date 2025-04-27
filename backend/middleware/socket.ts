@@ -1,21 +1,19 @@
 import { Server } from "socket.io";
 
-export const io = new Server({
-  cors: {
-    origin: "*",
-  },
-});
+let io: Server;
 
-io.on("connection", (socket) => {
-  console.log("A user connected:", socket.id);
-
-  // Listen for room joins (user-specific rooms)
-  socket.on("join", (userId) => {
-    socket.join(`user_${userId}`);
-    console.log(`User ${userId} joined room`);
+export const initSocket = (httpServer: any) => {
+  io = new Server(httpServer, {
+    cors: {
+      origin: "*"
+    }
   });
 
-  socket.on("disconnect", () => {
-    console.log("User disconnected:", socket.id);
+  io.on("connection", socket => {
+    console.log("New client connected", socket.id);
   });
-});
+
+  return io;
+};
+
+export { io };

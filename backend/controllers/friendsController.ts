@@ -8,7 +8,6 @@ import mongoose from "mongoose";
 
 export const getFriends = async (req: Request, res: Response): Promise<void> => {
   const { userId } = req.query;
-  console.log(userId);
 
   if (!userId) {
     res.status(400).json({ error: "User ID is required" });

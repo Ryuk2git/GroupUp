@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { sequelize } from "../config/db"; // MySQL connection
 import { QueryTypes } from "sequelize";
 import mongoose from "mongoose"; // MongoDB connection
+import Event from "../models/Events"; // Import the MongoDB Event model
 import _ from "lodash"; // Lodash for debouncing
 // import Fuse from "fuse.js"; // (Commented out, can be used for fuzzy search if needed)
 
@@ -144,13 +145,28 @@ const searchTasks = async (query: string, limit: number = 10) => {
  * 6. SEARCH EVENTS  
  */
 const searchEvents = async (query: string, limit: number = 10) => {
-  return sequelize.query(
+  // 1. Search MySQL events table
+  const mysqlEvents = await sequelize.query(
     `SELECT * FROM events WHERE title LIKE :searchQuery LIMIT :limit`,
     {
       replacements: { searchQuery: `${query}%`, limit },
       type: QueryTypes.SELECT,
     }
   );
+
+  // 2. Search MongoDB Events collection using your Event model
+  const mongoEvents = await Event.find(
+    { title: { $regex: `^${query}`, $options: "i" } }
+  )
+    .limit(limit)
+    .lean();
+
+  // 3. Add a source property for clarity (optional)
+  const mysqlResults = mysqlEvents.map((e: any) => ({ ...e, source: "mysql" }));
+  const mongoResults = mongoEvents.map((e: any) => ({ ...e, source: "mongo" }));
+
+  // 4. Combine and return (optionally, you can sort or deduplicate)
+  return [...mysqlResults, ...mongoResults].slice(0, limit);
 };
 
 /**  

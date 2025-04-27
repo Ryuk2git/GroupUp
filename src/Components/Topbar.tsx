@@ -85,21 +85,29 @@ const Topbar: React.FC = () => {
         setIsSearching(true);
         setSearchError("");
 
-        console.log("Search Category is: ", searchCategory)
+        console.log("Search Category is: ", searchCategory);
         const response = await axios.get(`http://localhost:3000/api/search`, {
           params: { query, category, currentUserId },
           cancelToken: cancelTokenSource.current.token,
         });
 
-        const { users = [], projects = [], files = [], tasks = [], events = [] } = response.data;
-        const flattenedResults = [
-          ...users.map((user: any) => ({ type: "Chats", ...user })),
-          ...projects.map((project: any) => ({ type: "Project", ...project })),
-          ...files.map((file: any) => ({ type: "File", ...file })),
-          ...tasks.map((task: any) => ({ type: "Task", ...task })),
-          ...events.map((event: any) => ({ type: "Event", ...event })),
-        ];
+        const responseData = response.data;
+        let flattenedResults: any[] = [];
 
+        if (Array.isArray(responseData)) {
+          // Direct array (e.g., Events search)
+          flattenedResults = responseData.map((event: any) => ({ type: "Event", ...event }));
+        } else {
+          // Object with keys (e.g., All search)
+          const { users = [], projects = [], files = [], tasks = [], events = [] } = responseData;
+          flattenedResults = [
+            ...users.map((user: any) => ({ type: "Chats", ...user })),
+            ...projects.map((project: any) => ({ type: "Project", ...project })),
+            ...files.map((file: any) => ({ type: "File", ...file })),
+            ...tasks.map((task: any) => ({ type: "Task", ...task })),
+            ...events.map((event: any) => ({ type: "Event", ...event })),
+          ];
+        }
         setSearchResults(flattenedResults);
         console.log(response.data);
         setShowSuggestions(flattenedResults.length > 0);

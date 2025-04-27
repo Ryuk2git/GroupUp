@@ -40,9 +40,14 @@
   border: none;
 }
 
+.chatArea-messageSender{
+  font-size: large;
+  color: var(--accent-yellow);
+}
+
 .chatArea-messageBubble {
   position: relative;
-  background: #2b2d31;
+  /* background: #2b2d31; */
   border-radius: 16px;
   padding: 8px 12px;
   word-break: break-word;

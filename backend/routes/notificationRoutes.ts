@@ -5,7 +5,7 @@ import { createNotification, getNotifications, markAsReadNotification, deleteAll
 const router = Router();
 
 // create a notification
-router.post('/', createNotification)
+router.post('/create', createNotification)
 
 // fetch users notifications
 router.get("/:userId", getNotifications);

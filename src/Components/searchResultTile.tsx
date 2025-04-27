@@ -5,6 +5,7 @@ import { useAuth } from "../Context/AuthContext";
 
 // Define the types of search results
 interface SearchResultItem {
+  title: string;
   userID: string;
   type: "Chats" | "Project" | "File" | "Mail" | "Task" | "Event";
   name: string;
@@ -102,7 +103,7 @@ const SearchResultTile: React.FC<SearchResultTileProps> = ({ item, onSelect }) =
       case "Event":
         return (
           <>
-            <p className="search-title">{item.name}</p>
+            <p className="search-title">{item.name || item.title}</p>
             {item.eventDate && <p className="search-description">Date: {item.eventDate}</p>}
           </>
         );

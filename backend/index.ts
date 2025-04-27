@@ -1,5 +1,4 @@
 import express from 'express';
-import bodyParser from 'body-parser';
 import passport from 'passport';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
@@ -12,9 +11,11 @@ import voiceChannelRoutes from './routes/voiceChannelRoutes';
 import notificationRoutes from './routes/notificationRoutes';
 import searchRoutes from './routes/serachRoutes'
 import driveRoutes from './routes/driveRoutes';
-import messageRoutes from './routes/messagesRoutes'
+import messageRoutes from './routes/messagesRoutes';
+import eventRoutes from './routes/eventRoutes';
 
 import { initDB } from './config/db';
+import { startNotificationScheduler } from './middleware/notificaitonScheduler';
 import { apiLogger } from './middleware/apiLogger';
 import session from 'express-session';
 
@@ -24,20 +25,22 @@ const PORT = process.env.PORT || 3000;
 const server = http.createServer(app);
 
 // Middleware
-app.use(bodyParser.json());
+app.use(express.json());
 app.use(cors({
     origin: 'http://localhost:5173', // Frontend origin
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
     credentials: true, // Allows cookies or credentials if needed
 }));
 
 const io = new Server(server, {
     cors: {
         origin: "http://localhost:5173", 
-        methods: ["GET", "POST", "PUT", "DELETE"],
+        methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+        credentials: true,
     },
     path: "/socket.io", // Ensure the path matches the client configuration
 });
+startNotificationScheduler();
 
 // Socket.IO connection
 io.on("connection", (socket) => {
@@ -81,6 +84,7 @@ app.use('/api/notifications', notificationRoutes);
 app.use('/api/search', searchRoutes);
 app.use('/api/drive', driveRoutes);
 app.use('/api/messages', messageRoutes);
+app.use('/api/events', eventRoutes);
 
 // Initialize databases and start the server
 initDB().then(() => {
