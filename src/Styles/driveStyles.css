@@ -1,0 +1,416 @@
+/* + New Button */
+.new-button-container {
+  position: relative;
+}
+
+.new-drive-button {
+  width: 100%;
+  padding: 10px;
+  background: var(--accent-yellow); /* Use accent yellow */
+  color: black; /* Use white text */
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.new-drive-button:hover {
+  background: var(--accent-light-yellow); /* Use lighter yellow for hover */
+}
+
+/* Dropdown Menu */
+.drive-dropdown-menu {
+  position: relative;
+  top: 0px;
+  left: 0;
+  width: 100%;
+  border: 1px solid var(--medium-gray); /* Use medium gray for border */
+  border-radius: 6px;
+  background: var(--darker-gray); /* Use darker gray for background */
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.5); /* Adjust shadow for dark theme */
+  z-index: 100;
+  display: block;
+}
+
+.drive-dropdown-item {
+  width: 100%;
+  padding: 10px;
+  text-align: left;
+  cursor: pointer;
+  border: none;
+  background: var(--darker-gray); /* Use darker gray for background */
+  color: var(--accent-white); /* Use white text */
+  display: block;
+}
+
+.drive-dropdown-item:hover {
+  background: var(--medium-gray); /* Use medium gray for hover */
+}
+
+/* Drive Menu Buttons */
+.drive-menu {
+  margin-top: 16px;
+}
+
+.drive-btn {
+  width: 100%;
+  padding: 10px;
+  border-radius: 10px;
+  text-align: left;
+  border: none;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--darker-gray); /* Use darker gray for background */
+  color: var(--accent-white); /* Use white text */
+}
+
+.drive-btn:hover {
+  background: var(--medium-gray); /* Use medium gray for hover */
+}
+
+/* Storage Section */
+.storage-section {
+  margin-top: 20px;
+  padding-top: 10px;
+  border-top: 1px solid var(--medium-gray); /* Use medium gray for border */
+}
+
+.storage-text {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  font-weight: bold;
+  color: var(--accent-white); /* Use white text */
+  margin-bottom: 6px;
+}
+
+/* Progress Bar */
+.progress-bar {
+  width: 100%;
+  height: 6px;
+  background: var(--medium-gray); /* Use medium gray for background */
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: var(--accent-yellow); /* Use accent yellow for progress */
+  transition: width 0.3s ease-in-out;
+}
+
+/* ============== */
+.drive-home,
+.my-drive,
+.shared,
+.starred,
+.trash {
+    padding: 20px;
+}
+
+h2 {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.recent-files {
+    display: flex;
+    gap: 10px;
+}
+
+.file-card {
+    background: #f5f5f5;
+    padding: 10px;
+    border-radius: 8px;
+    text-align: center;
+    width: 120px;
+    cursor: pointer;
+}
+
+.file-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 10px;
+}
+
+.file-list {
+    list-style: none;
+    padding: 0;
+}
+
+.file-list li {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+.owner {
+    font-size: 12px;
+    color: #666;
+}
+
+.drive-container {
+  display: flex;
+}
+
+.drive-main {
+  flex: 3;
+  padding: 20px;
+}
+
+.drive-filters {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.drive-filter {
+  background-color: var(--accent-yellow);
+  color: black;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 20px;
+  cursor: pointer;
+  width: 110px;
+}
+
+.drive-title {
+  margin: 15px 0px;
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.drive-categories {
+  display: flex;
+  gap: 15px;
+  margin-top: 10px;
+}
+
+.drive-category {
+  background-color: var(--medium-gray);
+  color: var(--accent-white);
+  padding: 40px;
+  flex: 1;
+  border-radius: 10px;
+  text-align: center;
+  font-size: 18px;
+}
+
+.drive-subtitle {
+  font-size: 18px;
+  font-weight: bold;
+  margin-top: 20px;
+}
+
+.drive-recent-files{
+  /* background-color: var(--medium-gray); */
+  height: auto;
+  margin-top: 10px;
+  border-radius: 5px;
+}
+.drive-recent-folders{
+  height: auto;
+  margin-top: 10px;
+  border-radius: 5px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  column-gap: 15px;
+}
+
+.drive-sidebar {
+  flex: 1;
+  height: 90vh;
+  background-color: var(--darker-gray);
+  padding: 20px;
+  border-radius: 20px;
+}
+
+.drive-shared {
+  background-color: var(--medium-gray);
+  padding: 15px;
+  border-radius: 10px;
+}
+
+.drive-shared-file {
+  display: flex;
+  justify-content: space-between;
+  background-color: var(--darker-gray);
+  margin-top: 10px;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+.drive-shared-icons {
+  width: 30px;
+  height: 30px;
+  background-color: var(--accent-yellow);
+  border-radius: 50%;
+}
+
+/* Tile */
+/* Tile container */
+.drive-tile {
+  display: flex;
+  align-items: center;
+  color: white;
+  padding: 12px 16px;
+  border-radius: 10px;
+  gap: 10px;
+  justify-content: space-between;
+  margin: 5px 0px;
+  transition: background 0.2s ease-in-out;
+  position: relative;
+}
+
+/* Folder and file specific styles */
+.drive-folder-tile {
+  background-color: var(--medium-gray);
+  width: 270px;
+}
+
+.drive-file-tile {
+  background-color: var(--medium-gray);
+  width: 100%;
+  padding: 10px;
+}
+
+.drive-tile:hover {
+  background-color: var(--darker-gray);
+}
+
+/* Left section */
+.drive-tile-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1 1 30%;
+  min-width: 0;
+}
+
+.drive-tile-icon {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+}
+
+.drive-tile-icon.folder {
+  background: url('/folder-icon.svg') no-repeat center center;
+  background-size: contain;
+}
+
+.drive-tile-icon.file {
+  background: url('/file-icon.svg') no-repeat center center;
+  background-size: contain;
+}
+
+.drive-tile-name {
+  font-weight: bold;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 150px;
+}
+
+/* Center section */
+.drive-tile-center {
+  display: flex;
+  gap: 16px;
+  font-size: 12px;
+  color: #bbb;
+  flex: 1;
+  min-width: 0;
+  transition: none !important;
+  opacity: 1 !important;
+}
+
+.default-content {
+  display: flex;
+  gap: 16px;
+  font-size: 12px;
+  color: #bbb;
+  transition: opacity 0.2s;
+}
+
+.hover-actions {
+  display: none;
+  gap: 8px;
+  align-items: center;
+  position: absolute;
+  right: 40px; /* Account for options button width */
+  background: var(--medium-gray);
+  padding: 4px;
+  border-radius: 4px
+}
+
+.drive-tile:hover .default-content {
+  opacity: 0;
+}
+
+.drive-tile:hover .hover-actions {
+  display: flex;
+}
+
+.drive-tile:hover .drive-tile-right {
+  gap: 12px;
+}
+
+/* Right section */
+.drive-tile-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.drive-tile-size {
+  font-size: 12px;
+  margin-right: 8px;
+  color: #ddd;
+}
+
+.drive-tile-options {
+  background: none;
+  border: none;
+  color: white;
+  padding: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  position: relative;
+  z-index: 1;
+  background: transparent;
+  transition: background 0.2s;
+}
+
+.drive-tile-options:hover {
+  background: #444;
+}
+
+/* Hover buttons */
+.share-button, .download-button {
+  padding: 4px 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  background: #444;
+  color: white;
+  transition: background 0.2s;
+  font-size: 12px;
+}
+
+.share-button:hover, .download-button:hover {
+  background: var(--accent-yellow);
+  color: black;
+}

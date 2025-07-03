@@ -1,0 +1,770 @@
+/* ===================================
+   GLOBAL RESETS
+   =================================== */
+   * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  /* ===================================
+     ROOT VARIABLES (Updated with Dark Theme)
+     =================================== */
+  :root {
+    --main-bg: var(--dark-background);
+    --sidebar-bg: var(--darker-gray);
+    --accent: var(--accent-yellow);
+    --text-color: var(--accent-white);
+    --subtext-color: var(--accent-light-yellow);
+    --header-height: 48px;
+    --sidebar-width: 80px; /* Thinner sidebar */
+    --recent-width: 200px;
+    --rightbar-width: 240px;
+    --border-color: var(--medium-gray);
+  }
+  
+  /* ===================================
+     PAGE CONTAINER
+     =================================== */
+  .main-page-container {
+    display: flex;
+    width: 100vw;
+    height: 100vh;
+    background-color: var(--main-bg);
+    color: var(--text-color);
+    overflow: hidden;
+  }
+  
+  /* ===================================
+     LEFT SIDEBAR (Thinner Navigation)
+     =================================== */
+  .main-sidebar {
+    width: var(--sidebar-width);
+    background-color: var(--main-bg);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 10px;
+    justify-content: space-between;
+  }
+  
+  /* Sidebar Logo */
+  .main-sidebar-logo {
+    width: 62px;
+    height: 62px;
+    margin-bottom: 10px;
+    border-radius: 12px;
+    background-color: var(--darker-gray);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+  
+  /* Navigation Buttons */
+  .main-nav-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0px;
+  }
+  
+  .main-nav-item {
+    width: 100px;
+    height: 62px;
+    padding: 12px 0px;
+    background: none;
+    border: none;
+    /* width: 62px;
+    height: 62px; 
+    border-radius: 12px; 
+    background-color: var(--medium-gray); */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .main-nav-item:hover {
+    background: rgba(255, 255, 255, 0.1); /* Subtle hover effect */
+    color: #00bcd4; /* Highlight color on hover */
+  }
+
+  .main-nav-item:hover {
+    background-color: var(--accent);
+  }
+
+  .main-nav-item.active {
+    background-color: var(--medium-gray);
+  }
+  
+  
+  /* ===================================
+     RECENT FRIENDS & FILES SECTION
+     =================================== */
+  .main-recent-section {
+    width: 300px;
+    background-color: var(--sidebar-bg);
+    padding: 16px 5px;
+    border-right: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .slide-in {
+    animation: slideIn 0.5s forwards;
+  }
+  
+  .slide-out {
+    animation: slideOut 0.5s forwards;
+  }
+  
+  @keyframes slideIn {
+    from {
+      transform: translateX(100%);
+    }
+    to {
+      transform: translateX(0);
+    }
+  }
+  
+  @keyframes slideOut {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-100%);
+    }
+  }
+
+  .main-recent-title {
+    font-size: 14px;
+    color: var(--subtext-color);
+    margin-bottom: 10px;
+  }
+  
+  .main-recent-list {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .main-recent-item {
+    padding: 10px;
+    margin-bottom: 1px;
+    background-color: var(--medium-gray);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  
+  .main-recent-item:hover {
+    background-color: var(--accent);
+    color: var(--dark-background);
+  }
+  
+  /* ===================================
+     Context Panel
+     =================================== */     
+
+     .chatlist-wrapper {
+      display: flex;
+      flex-direction: column;
+      background-color: var(--darker-gray);
+      height: 100%;
+      padding: 0.5rem;
+      font-family: 'Segoe UI', sans-serif;
+      font-size: 0.95rem;
+      color: var(--accent-white);
+    }
+
+    .chatlist-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.5rem;
+      font-weight: bold;
+      padding: 0 0.25rem;
+    }
+
+    .chatlist-new-btn {
+      background-color: var(--accent-yellow);
+      color: #000;
+      padding: 4px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      position: relative;
+      font-size: 0.85rem;
+      user-select: none;
+    }
+
+    .chatlist-dropdown {
+      position: absolute;
+      top: 110%;
+      right: 0;
+      background-color: var(--medium-gray);
+      border-radius: 6px;
+      overflow: hidden;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+      z-index: 99;
+    }
+
+    .chatlist-dropdown-item {
+      padding: 8px 12px;
+      cursor: pointer;
+      white-space: nowrap;
+      color: var(--accent-white);
+    }
+
+    .chatlist-dropdown-item:hover {
+      background-color: var(--darker-gray);
+    }
+
+    .chatlist-section {
+      height: 50%;
+      margin-bottom: 0.5rem;
+      background-color: var(--dark-background);
+      border-radius: 6px;
+      padding: 0.4rem 0.25rem;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .chatlist-scrollable {
+      overflow-y: auto;
+    }
+
+    .chatlist-scrollable::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .chatlist-scrollable::-webkit-scrollbar-thumb {
+      background-color: var(--medium-gray);
+      border-radius: 3px;
+    }
+
+    .chatlist-title {
+      margin: 4px 0 8px 8px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--accent-light-yellow);
+    }
+
+    .chatlist-item {
+      display: flex;
+      align-items: center;
+      padding: 6px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+
+    .chatlist-item:hover {
+      background-color: var(--accent-yellow);
+      color: black;
+    }
+
+    .chatlist-avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      margin-right: 10px;
+    }
+
+    .chatlist-selected {
+      font-weight: bold;
+      color: var(--accent-white);
+    }
+
+    .chatlist-empty {
+      font-size: 0.85rem;
+      text-align: center;
+      color: #aaa;
+      margin-top: 1rem;
+    }
+     .user-info {
+      display: flex;
+      /* height: ; */
+      align-items: center;
+      padding: 10px;
+      background: #333;
+      border-top: 1px solid #444;
+      border-radius: 5px;
+      position: sticky;
+      bottom: 0;
+    }
+
+    .user-avatar {
+      width: 50px;
+      height: 50px;
+      aspect-ratio: 1/1;
+      border-radius: 50%;
+      background: #555;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      margin-right: 10px;
+    }
+
+    .user-details {
+      flex: 1;
+    }
+
+    .username {
+      font-size: 14px;
+      margin: 0;
+    }
+
+    .user-controls {
+      display: flex;
+      flex-direction: row-reverse;
+      /* justify-content: space-between; */
+      gap: 10px;
+      margin-top: 5px;
+    }
+
+    .user-controls button {
+      background: #444;
+      border: none;
+      border-radius: 5px;
+      color: white;
+      padding: 5px;
+      cursor: pointer;
+    }
+
+    .user-controls button:hover {
+      background: #555;
+    }
+
+  /* ===================================
+     MAIN CONTENT WRAPPER
+     =================================== */
+  .main-content-wrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  /* ===================================
+     TOP BAR
+     =================================== */
+     .main-topbar {
+      height: var(--header-height);
+      background-color: var(--sidebar-bg);
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      border-bottom: 1px solid var(--border-color);
+    }
+    
+    .main-search-container {
+      display: flex;
+      align-items: center;
+      position: relative;
+      flex: 1;
+    }
+    
+    /* Dropdown */
+    .search-dropdown {
+      position: relative;
+      z-index: 99999;
+    }
+    
+    .dropdown-button {
+      background: var(--light-gray);
+      color: var(--accent);
+      border: 1px solid var(--border-color);
+      padding: 5px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background 0.3s ease, transform 0.2s ease;
+    }
+    
+    .dropdown-button:hover {
+      background: var(--hover-gray);
+      transform: scale(1.05);
+    }
+
+    .dropdown-menu {
+      position: absolute;
+      top: 110%;
+      left: 0;
+      background: var(--darker-gray);
+      border-radius: 8px;
+      width: 140px;
+      list-style: none;
+      padding: 6px 0;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-10px);
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      z-index: 99999;
+    }
+    
+    .search-dropdown .dropdown-menu {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+      z-index: 99999;
+    }
+    
+    .dropdown-menu li {
+      padding: 10px 14px;
+      cursor: pointer;
+      font-size: 14px;
+      color: var(--accent);
+      transition: background 0.3s ease, transform 0.2s ease;
+      border-radius: 4px;
+    }
+    
+    .dropdown-menu li:hover {
+      background-color: var(--hover-gray);
+      transform: translateX(4px);
+    }
+    
+    /* Search Bar */
+    .main-topbar-search {
+      flex: 1;
+      position: relative;
+      margin-left: 10px;
+    }
+    
+    .main-search-input {
+      width: 100%;
+      height: 28px;
+      border-radius: 4px;
+      border: none;
+      padding: 0 8px;
+      background-color: var(--medium-gray);
+      color: var(--text-color);
+      font-size: 14px;
+    }
+    
+    /* Search Suggestions */
+.search-suggestions {
+  position: absolute;
+  width: 100%;
+  background: var(--dark-background);
+  border-radius: 6px;
+  max-height: 400px;
+  overflow-y: auto;
+  list-style: none;
+  padding: 0;
+  margin-top: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+/* Show Suggestions Smoothly */
+.main-topbar-search:focus-within .search-suggestions {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.search-suggestions li {
+  padding: 10px 14px;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--yellow);
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.search-suggestions li:hover {
+  background-color: var(--hover-gray);
+  transform: translateX(4px);
+}
+
+.search-loading {
+  padding: 10px;
+  color: #666;
+  font-style: italic;
+}
+
+.search-error {
+  padding: 10px;
+  color: #ff4444;
+}
+
+.no-results {
+  padding: 10px;
+  color: #666;
+}
+    
+    /* Icons */
+    .main-topbar-icons {
+      display: flex;
+      margin-left: 10px;
+      gap: 10px;
+    }
+    
+    .main-icon-button {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 18px;
+    }
+
+   /* NOTIFCAITON DROPDOWN */
+   .user-notification-container {
+    position: relative;
+    display: inline-block;
+  }
+
+  .user-notification-header {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding: 8px 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    font-size: 14px;
+    font-weight: bold;
+    color: #fff;
+  }
+  
+  
+  .user-notification-dropdown {
+    position: absolute;
+    top: 150%;
+    right: 0; 
+    background: var(--dark-background);
+    width: 320px;
+    max-height: 400px;
+    overflow-y: auto;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    padding: 10px;
+    z-index: 1000;
+  }
+  
+  /* Notification Header */
+  .user-notification-header {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding: 8px 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    font-size: 16px;
+    font-weight: bold;
+    color: #fff;
+  }
+  
+  /* Individual Notification Item */
+  .user-notification-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    cursor: pointer;
+    transition: background 0.2s ease-in-out;
+  }
+  
+  .user-notification-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+  }
+  
+  /* Notification Icon */
+  .user-notification-icon {
+    width: 32px;
+    height: 32px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    color: #fff;
+  }
+  
+  /* Notification Content */
+  .user-notification-content {
+    flex-grow: 1;
+    color: #ccc;
+    font-size: 14px;
+  }
+  
+/* Notification List */
+.user-notification-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* Notification Tile */
+.user-notification-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #222;
+  border-radius: 6px;
+  padding: 10px 12px;
+  margin-bottom: 6px;
+  transition: background 0.2s ease-in-out;
+  border-left: 3px solid transparent;
+}
+
+/* Hover Effect */
+.user-notification-item:hover {
+  background: #2b2b2b;
+}
+
+/* Read vs Unread */
+.user-notification-unread {
+  font-weight: bold;
+  color: #f1f1f1;
+  border-left-color: #4caf50;
+}
+
+.user-notification-read {
+  font-weight: normal;
+  color: #bbb;
+  border-left-color: transparent;
+}
+
+/* Notification Content */
+.user-notification-info {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.user-notification-message {
+  font-size: 13px;
+  color: #ddd;
+}
+
+.user-notification-username {
+  font-size: 14px;
+  font-weight: bold;
+  color: #fff;
+}
+
+.user-notification-email {
+  font-size: 12px;
+  color: #999;
+}
+
+/* Action Buttons */
+.user-notification-actions button {
+  background: #333;
+  border: none;
+  color: #ccc;
+  font-size: 12px;
+  padding: 5px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  margin-left: 4px;
+}
+
+/* Accept Button */
+.user-notification-actions .accept {
+  background: #4caf50;
+  color: white;
+}
+
+.user-notification-actions .accept:hover {
+  background: #45a049;
+}
+
+/* Decline Button */
+.user-notification-actions .decline {
+  background: #ff4d4d;
+  color: white;
+}
+
+.user-notification-actions .decline:hover {
+  background: #e63946;
+}
+
+/* Dismiss & Snooze */
+.user-notification-actions .dismiss {
+  background: #777;
+}
+
+.user-notification-actions .dismiss:hover {
+  background: #888;
+}
+
+.user-notification-actions .snooze {
+  background: #ff9800;
+  color: white;
+}
+
+.user-notification-actions .snooze:hover {
+  background: #e68900;
+}
+
+  
+  /* ===================================
+     DYNAMIC CONTENT AREA
+     =================================== */
+  .main-dynamic-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 16px;
+  }
+  
+  .main-widgets-area {
+    flex: 1;
+    overflow-y: auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    grid-gap: 16px;
+  }
+  
+  .main-widget {
+    background-color: var(--darker-gray);
+    border-radius: 8px;
+    padding: 16px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    transition: background 0.2s;
+  }
+  
+  .main-widget:hover {
+    background-color: var(--accent);
+    color: var(--dark-background);
+  }
+  
+  /* ===================================
+     RIGHT SIDEBAR (Hidden Unless on Home)
+     =================================== */
+  .main-rightbar {
+    width: var(--rightbar-width);
+    background-color: var(--sidebar-bg);
+    border-left: 1px solid var(--border-color);
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .main-rightbar-panel {
+    flex: 1;
+    padding: 16px;
+    overflow-y: auto;
+  }
+  
+  /* ===================================
+     SCROLLBAR STYLING
+     =================================== */
+  .main-widgets-area::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  .main-widgets-area::-webkit-scrollbar-thumb {
+    background-color: var(--accent);
+    border-radius: 4px;
+  }
+  

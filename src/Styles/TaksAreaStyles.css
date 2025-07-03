@@ -1,0 +1,98 @@
+/* Container for the task content area */
+.task-content-area {
+  padding: 20px;
+}
+
+.task-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.task-filter {
+  display: flex;
+  align-items: center;
+}
+
+.task-filter label {
+  margin-right: 10px;
+}
+
+.task-filter select {
+  padding: 5px 10px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.task-table-container {
+  margin-top: 20px;
+  overflow-x: auto;
+}
+
+.task-table {
+  width: 100%;
+  border-collapse: collapse;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.task-table th,
+.task-table td {
+  padding: 12px 15px;
+  text-align: left;
+}
+
+.task-table th {
+  background-color: #f4f7fb;
+  color: #555;
+  font-weight: 600;
+}
+
+.task-table td {
+  background-color: #fff;
+}
+
+.task-row:hover {
+  background-color: #f1f1f1;
+}
+
+.task-status {
+  font-weight: bold;
+  padding: 3px 10px;
+  border-radius: 5px;
+  color: #fff;
+}
+
+.task-status.completed {
+  background-color: #4caf50;
+}
+
+.task-status.pending {
+  background-color: #ff9800;
+}
+
+.task-status.in-progress {
+  background-color: #2196f3;
+}
+
+.task-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.task-action-icon {
+  cursor: pointer;
+  font-size: 18px;
+  color: #666;
+  transition: all 0.3s ease;
+}
+
+.task-action-icon:hover {
+  color: #333;
+}
+
+.task-action-icon:active {
+  transform: scale(0.9);
+}

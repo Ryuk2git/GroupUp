@@ -1,0 +1,289 @@
+/* ===== Main Container ===== */
+.chatArea-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 90vh;
+  min-height: 400px;
+  background: #1e1f22;
+  color: #e0e0e0;
+}
+
+/* ===== Messages Area ===== */
+.chatArea-messages {
+  flex-grow: 1;
+  overflow-y: auto;
+  padding: 20px;
+  scrollbar-width: thin;
+  scrollbar-color: #555 #2b2d31;
+}
+
+.chatArea-messages::-webkit-scrollbar {
+  width: 8px;
+}
+
+.chatArea-messages::-webkit-scrollbar-thumb {
+  background-color: #555;
+  border-radius: 6px;
+}
+
+.chatArea-messages::-webkit-scrollbar-track {
+  background-color: #2b2d31;
+}
+
+/* ===== Message Styling ===== */
+.chatArea-message {
+  position: relative;
+  padding: 4px 16px;
+  margin: 2px 0;
+  background: transparent;
+  border: none;
+}
+
+.chatArea-messageSender{
+  font-size: large;
+  color: var(--accent-yellow);
+}
+
+.chatArea-messageBubble {
+  position: relative;
+  /* background: #2b2d31; */
+  border-radius: 16px;
+  padding: 8px 12px;
+  word-break: break-word;
+  transition: background 0.2s ease;
+}
+
+.chatArea-message:hover .chatArea-messageBubble {
+  background: #36373d;
+  align-content: flex-end;
+}
+
+.chatArea-messageText {
+  color: #ffffff;
+  font-size: 15px;
+  line-height: 1.4;
+}
+
+/* Message Metadata */
+.chatArea-messageMeta {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  margin-top: 4px;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.2s ease;
+}
+
+.chatArea-message:hover .chatArea-messageMeta {
+  opacity: 1;
+  visibility: visible;
+}
+
+.chatArea-messageTimestamp {
+  font-size: 0.75rem;
+  color: #b3b3b3;
+  margin-left: 8px;
+}
+
+/* Message Actions */
+.chatArea-messageActions {
+  position: absolute;
+  right: 15.5%;
+  bottom: 60%;
+  display: flex;
+  gap: 6px;
+  background: #1e1f22;
+  border-radius: 24px;
+  padding: 6px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.2s ease;
+  transform: translateX(100%); /* Push outside message bubble */
+}
+
+.chatArea-message:hover .chatArea-messageActions {
+  opacity: 1;
+  visibility: visible;
+}
+
+.chatArea-messageAction {
+  background: none;
+  border: none;
+  padding: 4px;
+  cursor: pointer;
+  color: #b3b3b3;
+  transition: all 0.2s ease;
+}
+
+.chatArea-messageAction:hover {
+  color: #ffffff;
+  transform: scale(1.1);
+}
+
+/* Different Sender Styling */
+.chatArea-message:not(.same-sender) .chatArea-messageBubble {
+  border-radius: 16px 16px 16px 4px;
+}
+
+/* ===== Message Header ===== */
+.chatArea-messageHeader {
+  display: flex;
+  align-items: center;
+  margin-bottom: 6px;
+  padding-left: 4px;
+}
+
+.chatArea-senderPic {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+.chatArea-senderName {
+  font-size: 14px;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+/* ===== Chat Header ===== */
+.chatArea-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 60px;
+  padding: 15px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  background: #1e1f22;
+}
+
+.chatArea-userInfo {
+  display: flex;
+  align-items: center;
+}
+
+.chatArea-profilePic {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+.chatArea-userName {
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.chatArea-chatActions .chatArea-icon {
+  font-size: 22px;
+  margin-left: 15px;
+  cursor: pointer;
+  color: #b3b3b3;
+}
+
+.chatArea-chatActions .chatArea-icon:hover {
+  color: #ffffff;
+}
+
+/* ===== Message Input ===== */
+.chatArea-messageInput {
+  display: flex;
+  align-items: center;
+  padding: 12px;
+  background: #2b2d31;
+  border-top: 1px solid #444;
+  position: sticky;
+  bottom: 0;
+}
+
+.chatArea-inputField {
+  flex-grow: 1;
+  background: #40444b;
+  color: #ffffff;
+  border-radius: 8px;
+  padding: 12px;
+  border: none;
+  margin-right: 12px;
+  font-size: 15px;
+}
+
+.chatArea-sendButton {
+  background: #5865f2;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background 0.2s ease;
+}
+
+.chatArea-sendButton:hover {
+  background: #4752c4;
+}
+
+/* ===== User Profile ===== */
+.chatArea-userProfile {
+  text-align: center;
+  padding: 20px;
+  background: #1e1f22;
+  height: 100%;
+}
+
+.chatArea-profilePicLarge {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  margin-bottom: 10px;
+}
+
+.chatArea-status {
+  font-size: 14px;
+  color: #b3b3b3;
+  margin-top: 5px;
+}
+
+/* Date Divider */
+.chatArea-dateDivider {
+  display: flex;
+  align-items: center;
+  margin: 20px 0;
+  width: 100%;
+  color: #fff;
+  font-size: 0.85rem;
+  opacity: 0.5;
+}
+
+.chatArea-dateDivider::before,
+.chatArea-dateDivider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background-color: #ccc;
+}
+
+.chatArea-dateDivider span {
+  padding: 0 12px;
+  white-space: nowrap;
+}
+
+/* .chatArea-message.mine {
+  justify-content: flex-end;
+  text-align: right;
+}
+
+.chatArea-message.theirs {
+  justify-content: flex-start;
+  text-align: left;
+} */
+
+.chatArea-messageHeader {
+  display: flex;
+  margin-top: 10px;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 2px;
+}
